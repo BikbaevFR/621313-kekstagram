@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Фяргать Бикбаев](https://up.htmlacademy.ru/javascript/16/user/621313).
-* Наставник: `Неизвестно`.
+* Наставник: [Екатерина Малецкая](https://up.htmlacademy.ru/javascript/16/user/902197).
 
 ---
 
