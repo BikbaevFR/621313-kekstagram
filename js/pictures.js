@@ -40,8 +40,8 @@ var getMixArrays = function (array) {
 
 var numberUrlPicture = [];
 
-for (var i = 1; i <= 25; i++) {
-  numberUrlPicture.push(i);
+for (var indexUrl = 1; indexUrl <= quantityPictures; indexUrl++) {
+  numberUrlPicture.push(indexUrl);
   getMixArrays(numberUrlPicture);
 }
 
@@ -52,13 +52,13 @@ var getRandomInteger = function (min, max) {
   return rand;
 };
 
-var randomNumberLikes = getRandomInteger(15, 200);
-
 // Выдает рандомный массив с параметрами картинок
 var getRandomObjectPicture = function (array1, array2) {
   var randomObjectPicture = [];
 
   for (var index = 0; index < quantityPictures; index++) {
+    var randomNumberLikes = getRandomInteger(15, 200);
+
     var randomCommentIndex = getRandomInteger(0, array1.length - 1);
     var randomDescriptionIndex = getRandomInteger(0, array2.length - 1);
 
@@ -76,5 +76,26 @@ var getRandomObjectPicture = function (array1, array2) {
 };
 
 var pictures = getRandomObjectPicture(comments, descriptions);
-// Сделал временно, потому что линтер ругается)
-getRandomObjectPicture(pictures);
+
+// Находим контейнер, в который будем вставлять картинки
+var сontainerPictures = document.querySelector('.pictures');
+
+// Находим шаблон, который будем копировать
+var similarPictureTemplate = document.querySelector('#picture').content;
+
+var renderPicture = function (picture) {
+  // Копируем шаблон
+  var pictureElement = similarPictureTemplate.cloneNode(true);
+
+  pictureElement.querySelector('.picture__img').src = 'photos/' + picture.url + '.jpg';
+  pictureElement.querySelector('.picture__likes').textContent = picture.likes;
+  pictureElement.querySelector('.picture__comments').textContent = picture.comments;
+
+  return pictureElement;
+};
+
+var fragment = document.createDocumentFragment();
+for (var i = 0; i < pictures.length; i++) {
+  fragment.appendChild(renderPicture(pictures[i]));
+}
+сontainerPictures.appendChild(fragment);
