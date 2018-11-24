@@ -1,6 +1,6 @@
 'use strict';
 
-var comments = [
+var COMMENTS = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
   'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
@@ -9,7 +9,7 @@ var comments = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
-var descriptions = [
+var DESCRIPTIONS = [
   'Тестим новую камеру!',
   'Затусили с друзьями на море',
   'Как же круто тут кормят',
@@ -69,18 +69,18 @@ var getRandomObjectPicture = function (array1, array2) {
       var randomCommentIndex2 = getRandomInteger(0, array1.length - 1);
 
       if (randomCommentIndex1 !== randomCommentIndex2) {
-        var indexCommentsArray1 = comments[randomCommentIndex1];
-        var indexCommentsArray2 = comments[randomCommentIndex2];
+        var indexCommentsArray1 = COMMENTS[randomCommentIndex1];
+        var indexCommentsArray2 = COMMENTS[randomCommentIndex2];
 
         commentsArray.push(indexCommentsArray1);
         commentsArray.push(indexCommentsArray2);
       } else {
-        indexCommentsArray1 = comments[randomCommentIndex1];
+        indexCommentsArray1 = COMMENTS[randomCommentIndex1];
         commentsArray.push(indexCommentsArray1);
       }
     } else {
       var randomCommentIndex = getRandomInteger(0, array1.length - 1);
-      var indexCommentsArray = comments[randomCommentIndex];
+      var indexCommentsArray = COMMENTS[randomCommentIndex];
 
       commentsArray.push(indexCommentsArray);
     }
@@ -91,7 +91,7 @@ var getRandomObjectPicture = function (array1, array2) {
       url: numberUrlPicture[index].toString(),
       likes: randomNumberLikes,
       comments: commentsArray,
-      description: descriptions[randomDescriptionIndex]
+      description: DESCRIPTIONS[randomDescriptionIndex]
     };
 
     randomObjectPicture.push(newPicture);
@@ -100,7 +100,7 @@ var getRandomObjectPicture = function (array1, array2) {
   return randomObjectPicture;
 };
 
-var pictures = getRandomObjectPicture(comments, descriptions);
+var pictures = getRandomObjectPicture(COMMENTS, DESCRIPTIONS);
 
 // Находим контейнер, в который будем вставлять картинки
 var сontainerPictures = document.querySelector('.pictures');
@@ -125,6 +125,21 @@ for (var i = 0; i < pictures.length; i++) {
   var objectBigPicture = pictures[0];
 }
 сontainerPictures.appendChild(fragment);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Показываем блок фотографии в полноэкранном режиме
 var bigPicture = document.querySelector('.big-picture');
