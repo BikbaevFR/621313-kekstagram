@@ -18,7 +18,16 @@ var DESCRIPTIONS = [
   'Вот это тачка!'
 ];
 
+// Общее количество картинок на главной стр.
 var quantityPictures = 25;
+
+// Выдает рандомное число
+var getRandomInteger = function (min, max) {
+  var rand = min - 0.5 + Math.random() * (max - min + 1);
+  rand = Math.round(rand);
+
+  return rand;
+};
 
 // Выдает массив с рандомным, неповторяющимся порядком чисел
 var getMixArrays = function (array) {
@@ -38,69 +47,69 @@ var getMixArrays = function (array) {
   return array;
 };
 
-var numberUrlPicture = [];
+// Выдает массив с адресами картинок
+var getArrayUrlPicture = function () {
+  var array = [];
+  var arrayUrlPicture = [];
 
-for (var indexUrl = 1; indexUrl <= quantityPictures; indexUrl++) {
-  numberUrlPicture.push(indexUrl);
-  getMixArrays(numberUrlPicture);
-}
+  for (var i = 1; i <= quantityPictures; i++) {
+    array.push(i);
+    getMixArrays(array);
+  }
 
-// Выдает рандомное число
-var getRandomInteger = function (min, max) {
-  var rand = min - 0.5 + Math.random() * (max - min + 1);
-  rand = Math.round(rand);
-  return rand;
+  for (var j = 0; j < array.length; j++) {
+    arrayUrlPicture.push('photos/' + array[j] + '.jpg');
+  }
+
+  return arrayUrlPicture;
 };
 
-// Выдает рандомный массив с параметрами картинок
-var getRandomObjectPicture = function (array1, array2) {
-  var randomObjectPicture = [];
+// Выдает массив с комментариями
+var getArrayComments = function (array) {
+  var arrayComments = [];
+  var numberComments = getRandomInteger(1, 2);
 
-  for (var index = 0; index < quantityPictures; index++) {
+  for (var i = 1; i <= numberComments; i++) {
+    var randomCommentIndex = getRandomInteger(0, array.length - 1);
+    var indexCommentsArray = COMMENTS[randomCommentIndex];
+
+    arrayComments.push(indexCommentsArray);
+  }
+
+  return arrayComments;
+};
+
+// Выдает массив с рандомными объектами. В каждой 4 ключа(1. Url 2. Likes 3. Comments 4. Description)
+var getRandomArrayPicture = function (array1, array2) {
+  var randomArrayPicture = [];
+
+  // Получаем массив с рандомными адресами картинок
+  var numberUrlPicture = getArrayUrlPicture();
+
+  for (var i = 0; i < quantityPictures; i++) {
     // Рандомное количество лайков
     var randomNumberLikes = getRandomInteger(15, 200);
 
     // Создает массив комментарией длиной 1 или 2
-    var numberComments = getRandomInteger(1, 2);
-    var commentsArray = [];
+    var commentsArray = getArrayComments(array1);
 
-    if (numberComments === 2) {
-      var randomCommentIndex1 = getRandomInteger(0, array1.length - 1);
-      var randomCommentIndex2 = getRandomInteger(0, array1.length - 1);
-
-      if (randomCommentIndex1 !== randomCommentIndex2) {
-        var indexCommentsArray1 = COMMENTS[randomCommentIndex1];
-        var indexCommentsArray2 = COMMENTS[randomCommentIndex2];
-
-        commentsArray.push(indexCommentsArray1);
-        commentsArray.push(indexCommentsArray2);
-      } else {
-        indexCommentsArray1 = COMMENTS[randomCommentIndex1];
-        commentsArray.push(indexCommentsArray1);
-      }
-    } else {
-      var randomCommentIndex = getRandomInteger(0, array1.length - 1);
-      var indexCommentsArray = COMMENTS[randomCommentIndex];
-
-      commentsArray.push(indexCommentsArray);
-    }
     // Рандомный номер массива описаний
     var randomDescriptionIndex = getRandomInteger(0, array2.length - 1);
 
     var newPicture = {
-      url: numberUrlPicture[index].toString(),
+      url: numberUrlPicture[i],
       likes: randomNumberLikes,
       comments: commentsArray,
       description: DESCRIPTIONS[randomDescriptionIndex]
     };
 
-    randomObjectPicture.push(newPicture);
+    randomArrayPicture.push(newPicture);
   }
 
-  return randomObjectPicture;
+  return randomArrayPicture;
 };
 
-var pictures = getRandomObjectPicture(COMMENTS, DESCRIPTIONS);
+var pictures = getRandomArrayPicture(COMMENTS, DESCRIPTIONS);
 
 // Находим контейнер, в который будем вставлять картинки
 var сontainerPictures = document.querySelector('.pictures');
@@ -108,11 +117,12 @@ var сontainerPictures = document.querySelector('.pictures');
 // Находим шаблон, который будем копировать
 var similarPictureTemplate = document.querySelector('#picture').content;
 
+// Отдает рандомную картинку созданную на основе шаблона
 var renderPicture = function (picture) {
   // Копируем шаблон
   var pictureElement = similarPictureTemplate.cloneNode(true);
 
-  pictureElement.querySelector('.picture__img').src = 'photos/' + picture.url + '.jpg';
+  pictureElement.querySelector('.picture__img').src = picture.url;
   pictureElement.querySelector('.picture__likes').textContent = picture.likes;
   pictureElement.querySelector('.picture__comments').textContent = picture.comments.length;
 
@@ -122,44 +132,28 @@ var renderPicture = function (picture) {
 var fragment = document.createDocumentFragment();
 for (var i = 0; i < pictures.length; i++) {
   fragment.appendChild(renderPicture(pictures[i]));
-  var objectBigPicture = pictures[0];
 }
 сontainerPictures.appendChild(fragment);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// ПЕРЕХОДИМ В ПОЛНОЭКРАННЫЙ РЕЖИМ
+var objectBigPicture = pictures[0];
 
 // Показываем блок фотографии в полноэкранном режиме
 var bigPicture = document.querySelector('.big-picture');
 bigPicture.classList.remove('hidden');
 
+// Меняем адрес картинки
 var bigPictureImgBlock = bigPicture.querySelector('.big-picture__img');
 var bigPictureImg = bigPictureImgBlock.querySelector('img');
-bigPictureImg.src = 'photos/' + objectBigPicture.url + '.jpg';
+bigPictureImg.src = objectBigPicture.url;
 
+// Меняем количество лайков картинки
 var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
 bigPictureLikesCount.textContent = objectBigPicture.likes;
 
+// Меняем описание картинки
 var bigPictureDescription = bigPicture.querySelector('.social__caption');
 bigPictureDescription.textContent = objectBigPicture.description;
-
-var bigPictureCommentsList = bigPicture.querySelector('.social__comments');
-// Удаляем дочерние элементы
-while (bigPictureCommentsList.firstChild) {
-  bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
-}
 
 // Создает элемент
 var makeElement = function (tagName, className, text) {
@@ -170,6 +164,7 @@ var makeElement = function (tagName, className, text) {
   }
   return element;
 };
+
 // Создает рандомный комментарий
 var createComment = function (comment) {
   var listItem = makeElement('li', 'social__comment');
@@ -185,10 +180,22 @@ var createComment = function (comment) {
   return listItem;
 };
 
-for (var indexArrayComments = 0; indexArrayComments < objectBigPicture.comments.length; indexArrayComments++) {
-  var commentsItem = createComment(objectBigPicture.comments[indexArrayComments]);
-  bigPictureCommentsList.appendChild(commentsItem);
-}
+// Удаляет и добавляет комментарии в список
+var addCommentToList = function () {
+  var bigPictureCommentsList = bigPicture.querySelector('.social__comments');
+
+  // Удаляет дочерние элементы
+  while (bigPictureCommentsList.firstChild) {
+    bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
+  }
+
+  for (var index = 0; index < objectBigPicture.comments.length; index++) {
+    var commentsItem = createComment(objectBigPicture.comments[index]);
+    bigPictureCommentsList.appendChild(commentsItem);
+  }
+};
+
+addCommentToList();
 
 // Прячем блок счётчика комментариев
 var bigPictureCommentCount = bigPicture.querySelector('.social__comment-count');
