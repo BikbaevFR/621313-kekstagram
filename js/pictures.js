@@ -19,7 +19,7 @@ var DESCRIPTIONS = [
 ];
 
 // Общее количество картинок на главной стр.
-var quantityPictures = 25;
+var QUANTITY_PICTURES = 25;
 
 // Выдает рандомное число
 var getRandomInteger = function (min, max) {
@@ -47,12 +47,24 @@ var getMixArrays = function (array) {
   return array;
 };
 
+// Выдает массив с номерами
+var getArrayNumber = function () {
+  var array = [];
+
+  for (var i = 1; i <= QUANTITY_PICTURES; i++) {
+    array.push(i);
+    getMixArrays(array);
+  }
+
+  return array;
+};
+
 // Выдает массив с адресами картинок
 var getArrayUrlPicture = function () {
   var array = [];
   var arrayUrlPicture = [];
 
-  for (var i = 1; i <= quantityPictures; i++) {
+  for (var i = 1; i <= QUANTITY_PICTURES; i++) {
     array.push(i);
     getMixArrays(array);
   }
@@ -84,9 +96,10 @@ var getRandomArrayPicture = function (array1, array2) {
   var randomArrayPicture = [];
 
   // Получаем массив с рандомными адресами картинок
-  var numberUrlPicture = getArrayUrlPicture();
+  var numberUrlPicture = getArrayNumber();
+  numberUrlPicture = getArrayUrlPicture();
 
-  for (var i = 0; i < quantityPictures; i++) {
+  for (var i = 0; i < QUANTITY_PICTURES; i++) {
     // Рандомное количество лайков
     var randomNumberLikes = getRandomInteger(15, 200);
 
