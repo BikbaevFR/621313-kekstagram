@@ -153,7 +153,7 @@ var objectBigPicture = pictures[0];
 
 // Показываем блок фотографии в полноэкранном режиме
 var bigPicture = document.querySelector('.big-picture');
-bigPicture.classList.remove('hidden');
+// bigPicture.classList.remove('hidden');
 
 // Меняем адрес картинки
 var bigPictureImgBlock = bigPicture.querySelector('.big-picture__img');
@@ -217,3 +217,152 @@ bigPictureCommentCount.classList.add('visually-hidden');
 // Прячем блок загрузки новых комментариев
 var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
 bigPictureCommentsLoader.classList.add('visually-hidden');
+
+
+// ==========================4-ОЕ ЗАДАНИЕ "ПОДРОБНОСТИ"===================================
+
+var ESC_KEYCODE = 27;
+// var ENTER_KEYCODE = 13;
+
+var imgUploady = document.querySelector('.img-upload');
+var uploadFile = document.getElementById('upload-file');
+var uploadCancel = document.getElementById('upload-cancel');
+var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
+
+var effectLevel = imgUploady.querySelector('input[name="effect-level"]');
+var effectLevelPin = imgUploady.querySelector('.effect-level__pin');
+// var effectLevelLine = imgUploady.querySelector('.effect-level__line');
+// var effectLevelDepth = imgUploady.querySelector('.effect-level__depth');
+
+// Закрывает по нажатию на esc
+var onUploadOverlayEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeImgUploadOverlay();
+  }
+};
+
+// Добавляет обработчик на ESC
+var addEventListenerKeydown = function () {
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+};
+
+// Удаляет обработчик на ESC
+var removeEventListenerKeydown = function () {
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
+};
+
+// Сбрасывает значение поля
+var clearFileInput = function (ctrl) {
+  try {
+    ctrl.value = null;
+  } catch (ex) {
+  /* От линтера */
+  }
+  if (ctrl.value) {
+    ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
+  }
+};
+
+// Открывает блок загрузки и редактирования картинок
+var openImgUploadOverlay = function () {
+  imgUploadOverlay.classList.remove('hidden');
+  addEventListenerKeydown();
+};
+
+// Закрывает блок загрузки и редактирования картинок
+var closeImgUploadOverlay = function () {
+  imgUploadOverlay.classList.add('hidden');
+  removeEventListenerKeydown();
+  clearFileInput(uploadFile);
+};
+
+// Обработчики событий
+uploadFile.addEventListener('change', function () {
+  openImgUploadOverlay();
+});
+
+uploadCancel.addEventListener('click', function () {
+  closeImgUploadOverlay();
+});
+
+// ==================================================================
+
+// Пин
+// Оставил реализацию слайдера на следующую лекцию
+
+effectLevelPin.addEventListener('mouseup', function () {
+  effectLevel.value = '50';
+});
+
+// ==================================================================
+
+// Эффекты превьюшки
+
+var effectsList = document.querySelector('.effects__list');
+var previewPhoto = document.querySelector('.img-upload__preview');
+
+// переменная для хранения текущего эффекта
+var currentEffect = '';
+
+effectsList.addEventListener('change', function (evt) {
+  var button = evt.target;
+  var effectName = button.value;
+
+  previewPhoto.classList.remove('effects__preview--' + currentEffect);
+  previewPhoto.classList.add('effects__preview--' + effectName);
+
+  currentEffect = effectName;
+});
+
+// ==================================================================
+
+// Открытие картинок в полноэкранном режиме
+
+var thumbnails = document.querySelectorAll('.picture__img');
+var bigPictureCancel = document.getElementById('picture-cancel');
+
+// Закрывает по нажатию на esc
+var onBigPictuteEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeBigPicture();
+  }
+};
+
+// Добавляет обработчик на ESC
+var addEventListenerKeydownBP = function () {
+  document.addEventListener('keydown', onBigPictuteEscPress);
+};
+
+// Удаляет обработчик на ESC
+var removeEventListenerKeydownBP = function () {
+  document.removeEventListener('keydown', onBigPictuteEscPress);
+};
+
+// Открывает в полноэкранном режиме картинку
+var openBigPicture = function () {
+  bigPicture.classList.remove('hidden');
+  addEventListenerKeydownBP();
+};
+
+// Закрывает картинку в полноэкранном режиме
+var closeBigPicture = function () {
+  bigPicture.classList.add('hidden');
+  removeEventListenerKeydownBP();
+};
+
+bigPictureCancel.addEventListener('click', function () {
+  closeBigPicture();
+});
+
+// Подставляет адрес маленькой картинки в большую
+var addThumbnailClickHandler = function (thumbnail, picture) {
+  thumbnail.addEventListener('click', function () {
+    openBigPicture();
+    bigPictureImg.src = picture;
+  });
+};
+
+// Перебирает два массива и передает addThumbnailClickHandlerы
+for (var indexArr = 0; indexArr < thumbnails.length; indexArr++) {
+  addThumbnailClickHandler(thumbnails[indexArr], pictures[indexArr].url);
+}
