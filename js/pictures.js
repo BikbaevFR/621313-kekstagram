@@ -241,16 +241,6 @@ var onUploadOverlayEscPress = function (evt) {
   }
 };
 
-// Добавляет обработчик на ESC
-var addEventListenerKeydown = function () {
-  document.addEventListener('keydown', onUploadOverlayEscPress);
-};
-
-// Удаляет обработчик на ESC
-var removeEventListenerKeydown = function () {
-  document.removeEventListener('keydown', onUploadOverlayEscPress);
-};
-
 // Сбрасывает значение поля
 var clearFileInput = function (ctrl) {
   try {
@@ -266,13 +256,13 @@ var clearFileInput = function (ctrl) {
 // Открывает блок загрузки и редактирования картинок
 var openImgUploadOverlay = function () {
   imgUploadOverlay.classList.remove('hidden');
-  addEventListenerKeydown();
+  document.addEventListener('keydown', onUploadOverlayEscPress);
 };
 
 // Закрывает блок загрузки и редактирования картинок
 var closeImgUploadOverlay = function () {
   imgUploadOverlay.classList.add('hidden');
-  removeEventListenerKeydown();
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
   clearFileInput(uploadFile);
 };
 
@@ -328,26 +318,16 @@ var onBigPictuteEscPress = function (evt) {
   }
 };
 
-// Добавляет обработчик на ESC
-var addEventListenerKeydownBP = function () {
-  document.addEventListener('keydown', onBigPictuteEscPress);
-};
-
-// Удаляет обработчик на ESC
-var removeEventListenerKeydownBP = function () {
-  document.removeEventListener('keydown', onBigPictuteEscPress);
-};
-
 // Открывает в полноэкранном режиме картинку
 var openBigPicture = function () {
   bigPicture.classList.remove('hidden');
-  addEventListenerKeydownBP();
+  document.addEventListener('keydown', onBigPictuteEscPress);
 };
 
 // Закрывает картинку в полноэкранном режиме
 var closeBigPicture = function () {
   bigPicture.classList.add('hidden');
-  removeEventListenerKeydownBP();
+  document.removeEventListener('keydown', onBigPictuteEscPress);
 };
 
 bigPictureCancel.addEventListener('click', function () {
