@@ -217,14 +217,9 @@ var drawBigPicture = function (object) {
   bigPictureCommentsLoader.classList.add('visually-hidden');
 };
 
-var objectBigPicture = pictures[0];
-drawBigPicture(objectBigPicture);
-
-
 // ==========================4-ОЕ ЗАДАНИЕ "ПОДРОБНОСТИ"===================================
 
 var ESC_KEYCODE = 27;
-// var ENTER_KEYCODE = 13;
 
 var imgUploady = document.querySelector('.img-upload');
 var uploadFile = document.getElementById('upload-file');
@@ -233,8 +228,6 @@ var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
 
 var effectLevel = imgUploady.querySelector('input[name="effect-level"]');
 var effectLevelPin = imgUploady.querySelector('.effect-level__pin');
-// var effectLevelLine = imgUploady.querySelector('.effect-level__line');
-// var effectLevelDepth = imgUploady.querySelector('.effect-level__depth');
 
 // Закрывает по нажатию на esc
 var onUploadOverlayEscPress = function (evt) {
@@ -242,20 +235,6 @@ var onUploadOverlayEscPress = function (evt) {
     closeImgUploadOverlay();
   }
 };
-
-// TODO: Доделать очистку поля при закрытии
-
-// // Сбрасывает значение поля
-// var clearFileInput = function (ctrl) {
-//   try {
-//     ctrl.value = null;
-//   } catch (ex) {
-//   /* От линтера */
-//   }
-//   if (ctrl.value) {
-//     ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
-//   }
-// };
 
 // Открывает блок загрузки и редактирования картинок
 var openImgUploadOverlay = function () {
@@ -267,7 +246,8 @@ var openImgUploadOverlay = function () {
 var closeImgUploadOverlay = function () {
   imgUploadOverlay.classList.add('hidden');
   document.removeEventListener('keydown', onUploadOverlayEscPress);
-  // clearFileInput(uploadFile);
+
+  // TODO: Доделать очистку поля при закрытии
 };
 
 // Обработчики событий
