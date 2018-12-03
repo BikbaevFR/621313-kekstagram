@@ -241,17 +241,19 @@ var onUploadOverlayEscPress = function (evt) {
   }
 };
 
-// Сбрасывает значение поля
-var clearFileInput = function (ctrl) {
-  try {
-    ctrl.value = null;
-  } catch (ex) {
-  /* От линтера */
-  }
-  if (ctrl.value) {
-    ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
-  }
-};
+// TODO: Доделать очистку поля при закрытии
+
+// // Сбрасывает значение поля
+// var clearFileInput = function (ctrl) {
+//   try {
+//     ctrl.value = null;
+//   } catch (ex) {
+//   /* От линтера */
+//   }
+//   if (ctrl.value) {
+//     ctrl.parentNode.replaceChild(ctrl.cloneNode(true), ctrl);
+//   }
+// };
 
 // Открывает блок загрузки и редактирования картинок
 var openImgUploadOverlay = function () {
