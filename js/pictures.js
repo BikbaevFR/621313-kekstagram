@@ -149,24 +149,16 @@ for (var i = 0; i < pictures.length; i++) {
 сontainerPictures.appendChild(fragment);
 
 // ПЕРЕХОДИМ В ПОЛНОЭКРАННЫЙ РЕЖИМ
-var objectBigPicture = pictures[0];
 
 // Показываем блок фотографии в полноэкранном режиме
 var bigPicture = document.querySelector('.big-picture');
-bigPicture.classList.remove('hidden');
-
-// Меняем адрес картинки
 var bigPictureImgBlock = bigPicture.querySelector('.big-picture__img');
 var bigPictureImg = bigPictureImgBlock.querySelector('img');
-bigPictureImg.src = objectBigPicture.url;
-
-// Меняем количество лайков картинки
 var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
-bigPictureLikesCount.textContent = objectBigPicture.likes;
-
-// Меняем описание картинки
 var bigPictureDescription = bigPicture.querySelector('.social__caption');
-bigPictureDescription.textContent = objectBigPicture.description;
+var bigPictureCommentCount = bigPicture.querySelector('.social__comment-count');
+var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
+var bigPictureCommentsList = document.querySelector('.social__comments');
 
 // Создает элемент
 var makeElement = function (tagName, className, text) {
@@ -194,26 +186,147 @@ var createComment = function (comment) {
 };
 
 // Удаляет и добавляет комментарии в список
-var addCommentToList = function () {
-  var bigPictureCommentsList = bigPicture.querySelector('.social__comments');
-
+var addCommentToList = function (object) {
   // Удаляет дочерние элементы
   while (bigPictureCommentsList.firstChild) {
     bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
   }
 
-  for (var index = 0; index < objectBigPicture.comments.length; index++) {
-    var commentsItem = createComment(objectBigPicture.comments[index]);
+  for (var index = 0; index < object.comments.length; index++) {
+    var commentsItem = createComment(object.comments[index]);
     bigPictureCommentsList.appendChild(commentsItem);
   }
 };
 
-addCommentToList();
+var drawBigPicture = function (object) {
+  // Меняем адрес картинки
+  bigPictureImg.src = object.url;
 
-// Прячем блок счётчика комментариев
-var bigPictureCommentCount = bigPicture.querySelector('.social__comment-count');
-bigPictureCommentCount.classList.add('visually-hidden');
+  // Меняем количество лайков картинки
+  bigPictureLikesCount.textContent = object.likes;
 
-// Прячем блок загрузки новых комментариев
-var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
-bigPictureCommentsLoader.classList.add('visually-hidden');
+  addCommentToList(object);
+
+  // Меняем описание картинки
+  bigPictureDescription.textContent = object.description;
+
+  // Прячем блок счётчика комментариев
+  bigPictureCommentCount.classList.add('visually-hidden');
+
+  // Прячем блок загрузки новых комментариев
+  bigPictureCommentsLoader.classList.add('visually-hidden');
+};
+
+// ==========================4-ОЕ ЗАДАНИЕ "ПОДРОБНОСТИ"===================================
+
+var ESC_KEYCODE = 27;
+
+var imgUploady = document.querySelector('.img-upload');
+var uploadFile = document.getElementById('upload-file');
+var uploadCancel = document.getElementById('upload-cancel');
+var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
+
+var effectLevel = imgUploady.querySelector('input[name="effect-level"]');
+var effectLevelPin = imgUploady.querySelector('.effect-level__pin');
+
+// Закрывает по нажатию на esc
+var onUploadOverlayEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeImgUploadOverlay();
+  }
+};
+
+// Открывает блок загрузки и редактирования картинок
+var openImgUploadOverlay = function () {
+  imgUploadOverlay.classList.remove('hidden');
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+};
+
+// Закрывает блок загрузки и редактирования картинок
+var closeImgUploadOverlay = function () {
+  imgUploadOverlay.classList.add('hidden');
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
+
+  // TODO: Доделать очистку поля при закрытии
+};
+
+// Обработчики событий
+uploadFile.addEventListener('change', function () {
+  openImgUploadOverlay();
+});
+
+uploadCancel.addEventListener('click', function () {
+  closeImgUploadOverlay();
+});
+
+// ==================================================================
+
+// Пин
+// Оставил реализацию слайдера на следующую лекцию
+
+effectLevelPin.addEventListener('mouseup', function () {
+  effectLevel.value = '50';
+});
+
+// ==================================================================
+
+// Эффекты превьюшки
+
+var effectsList = document.querySelector('.effects__list');
+var previewPhoto = document.querySelector('.img-upload__preview');
+
+// переменная для хранения текущего эффекта
+var currentEffect = '';
+
+effectsList.addEventListener('change', function (evt) {
+  var button = evt.target;
+  var effectName = button.value;
+
+  previewPhoto.classList.remove('effects__preview--' + currentEffect);
+  previewPhoto.classList.add('effects__preview--' + effectName);
+
+  currentEffect = effectName;
+});
+
+// ==================================================================
+
+// Открытие картинок в полноэкранном режиме
+
+var thumbnails = document.querySelectorAll('.picture__img');
+var bigPictureCancel = document.getElementById('picture-cancel');
+
+// Закрывает по нажатию на esc
+var onBigPictuteEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeBigPicture();
+  }
+};
+
+// Открывает в полноэкранном режиме картинку
+var openBigPicture = function () {
+  bigPicture.classList.remove('hidden');
+  document.addEventListener('keydown', onBigPictuteEscPress);
+};
+
+// Закрывает картинку в полноэкранном режиме
+var closeBigPicture = function () {
+  bigPicture.classList.add('hidden');
+  document.removeEventListener('keydown', onBigPictuteEscPress);
+};
+
+bigPictureCancel.addEventListener('click', function () {
+  closeBigPicture();
+});
+
+// Подставляет адрес маленькой картинки в большую
+var addThumbnailClickHandler = function (thumbnail, picture) {
+  thumbnail.addEventListener('click', function () {
+    openBigPicture();
+    drawBigPicture(picture);
+  });
+};
+
+// Перебирает два массива и передает addThumbnailClickHandler
+for (var indexArr = 0; indexArr < thumbnails.length; indexArr++) {
+  addThumbnailClickHandler(thumbnails[indexArr], pictures[indexArr]);
+}
