@@ -149,24 +149,16 @@ for (var i = 0; i < pictures.length; i++) {
 сontainerPictures.appendChild(fragment);
 
 // ПЕРЕХОДИМ В ПОЛНОЭКРАННЫЙ РЕЖИМ
-var objectBigPicture = pictures[0];
 
 // Показываем блок фотографии в полноэкранном режиме
 var bigPicture = document.querySelector('.big-picture');
-// bigPicture.classList.remove('hidden');
-
-// Меняем адрес картинки
 var bigPictureImgBlock = bigPicture.querySelector('.big-picture__img');
 var bigPictureImg = bigPictureImgBlock.querySelector('img');
-bigPictureImg.src = objectBigPicture.url;
-
-// Меняем количество лайков картинки
 var bigPictureLikesCount = bigPicture.querySelector('.likes-count');
-bigPictureLikesCount.textContent = objectBigPicture.likes;
-
-// Меняем описание картинки
 var bigPictureDescription = bigPicture.querySelector('.social__caption');
-bigPictureDescription.textContent = objectBigPicture.description;
+var bigPictureCommentCount = bigPicture.querySelector('.social__comment-count');
+var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
+var bigPictureCommentsList = document.querySelector('.social__comments');
 
 // Создает элемент
 var makeElement = function (tagName, className, text) {
@@ -194,29 +186,39 @@ var createComment = function (comment) {
 };
 
 // Удаляет и добавляет комментарии в список
-var addCommentToList = function () {
-  var bigPictureCommentsList = bigPicture.querySelector('.social__comments');
-
+var addCommentToList = function (object) {
   // Удаляет дочерние элементы
   while (bigPictureCommentsList.firstChild) {
     bigPictureCommentsList.removeChild(bigPictureCommentsList.firstChild);
   }
 
-  for (var index = 0; index < objectBigPicture.comments.length; index++) {
-    var commentsItem = createComment(objectBigPicture.comments[index]);
+  for (var index = 0; index < object.comments.length; index++) {
+    var commentsItem = createComment(object.comments[index]);
     bigPictureCommentsList.appendChild(commentsItem);
   }
 };
 
-addCommentToList();
+var drawBigPicture = function (object) {
+  // Меняем адрес картинки
+  bigPictureImg.src = object.url;
 
-// Прячем блок счётчика комментариев
-var bigPictureCommentCount = bigPicture.querySelector('.social__comment-count');
-bigPictureCommentCount.classList.add('visually-hidden');
+  // Меняем количество лайков картинки
+  bigPictureLikesCount.textContent = object.likes;
 
-// Прячем блок загрузки новых комментариев
-var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
-bigPictureCommentsLoader.classList.add('visually-hidden');
+  addCommentToList(object);
+
+  // Меняем описание картинки
+  bigPictureDescription.textContent = object.description;
+
+  // Прячем блок счётчика комментариев
+  bigPictureCommentCount.classList.add('visually-hidden');
+
+  // Прячем блок загрузки новых комментариев
+  bigPictureCommentsLoader.classList.add('visually-hidden');
+};
+
+var objectBigPicture = pictures[0];
+drawBigPicture(objectBigPicture);
 
 
 // ==========================4-ОЕ ЗАДАНИЕ "ПОДРОБНОСТИ"===================================
@@ -265,7 +267,7 @@ var openImgUploadOverlay = function () {
 var closeImgUploadOverlay = function () {
   imgUploadOverlay.classList.add('hidden');
   document.removeEventListener('keydown', onUploadOverlayEscPress);
-  clearFileInput(uploadFile);
+  // clearFileInput(uploadFile);
 };
 
 // Обработчики событий
@@ -340,11 +342,11 @@ bigPictureCancel.addEventListener('click', function () {
 var addThumbnailClickHandler = function (thumbnail, picture) {
   thumbnail.addEventListener('click', function () {
     openBigPicture();
-    bigPictureImg.src = picture;
+    drawBigPicture(picture);
   });
 };
 
-// Перебирает два массива и передает addThumbnailClickHandlerы
+// Перебирает два массива и передает addThumbnailClickHandler
 for (var indexArr = 0; indexArr < thumbnails.length; indexArr++) {
-  addThumbnailClickHandler(thumbnails[indexArr], pictures[indexArr].url);
+  addThumbnailClickHandler(thumbnails[indexArr], pictures[indexArr]);
 }
