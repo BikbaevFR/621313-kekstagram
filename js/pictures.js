@@ -220,6 +220,7 @@ var drawBigPicture = function (object) {
 // ==========================4-ОЕ ЗАДАНИЕ "ПОДРОБНОСТИ"===================================
 
 var ESC_KEYCODE = 27;
+var SPACE_KEYCODE = 32;
 
 var imgUploady = document.querySelector('.img-upload');
 var uploadFile = document.getElementById('upload-file');
@@ -330,3 +331,72 @@ var addThumbnailClickHandler = function (thumbnail, picture) {
 for (var indexArr = 0; indexArr < thumbnails.length; indexArr++) {
   addThumbnailClickHandler(thumbnails[indexArr], pictures[indexArr]);
 }
+
+// ==================================================================
+
+// Хэш-теги
+
+var MAX_HASHTAGS = 5;
+var MAX_LENGTH_HASHTAG = 20;
+
+var inputHashTags = document.querySelector('input[name="hashtags"]');
+
+// Проверка на валидность
+var validations = function (arr) {
+  arr.forEach(function (elem, num) {
+    var lengthHashtag = arr[num].length;
+    var firstSign = arr[num][0];
+    for (var index = 1; index < arr[num].length; index++) {
+      if (arr[num][index] === '#') {
+        inputHashTags.setCustomValidity('Хэштеги нужно разделяться пробелом');
+        return;
+      }
+    }
+    if (arr.length > 1) {
+      for (num = 0; num < arr.length; num++) {
+        for (var j = num + 1; j < arr.length; j++) {
+          if (arr[j] === arr[num]) {
+            inputHashTags.setCustomValidity('Нельзя использовать два одинаковых хэштега');
+            return;
+          }
+        }
+      }
+    }
+    if (firstSign !== '#') {
+      inputHashTags.setCustomValidity('Хэштег начинается со знака "#"(решётка)');
+      return;
+    }
+    if (lengthHashtag === 1) {
+      inputHashTags.setCustomValidity('Хэштег больше одного знака');
+      return;
+    }
+    if (lengthHashtag > MAX_LENGTH_HASHTAG) {
+      inputHashTags.setCustomValidity('Введено больше 25 символов для одного хэштэга');
+      return;
+    }
+    if (arr.length > MAX_HASHTAGS) {
+      inputHashTags.setCustomValidity('Введено больше пяти хэштегов');
+    } else {
+      inputHashTags.setCustomValidity('');
+    }
+  });
+};
+
+inputHashTags.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === SPACE_KEYCODE) {
+    var elementsHashTags = evt.target.value.trim().toLowerCase().split(' ');
+    validations(elementsHashTags);
+  }
+  inputHashTags.addEventListener('change', function () {
+    var elementsHashTags2 = evt.target.value.trim().toLowerCase().split(' ');
+    validations(elementsHashTags2);
+  });
+});
+
+inputHashTags.addEventListener('focus', function () {
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
+});
+
+inputHashTags.addEventListener('blur', function () {
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+});
