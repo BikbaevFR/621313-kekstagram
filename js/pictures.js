@@ -220,7 +220,7 @@ var drawBigPicture = function (object) {
 // ==========================4-ОЕ ЗАДАНИЕ "ПОДРОБНОСТИ"===================================
 
 var ESC_KEYCODE = 27;
-var SPACE_KEYCODE = 32;
+// var SPACE_KEYCODE = 32;
 
 var imgUploady = document.querySelector('.img-upload');
 var uploadFile = document.getElementById('upload-file');
@@ -341,27 +341,13 @@ var MAX_LENGTH_HASHTAG = 20;
 
 var inputHashTags = document.querySelector('input[name="hashtags"]');
 
-// Проверка на валидность
-var validations = function (arr) {
-  arr.forEach(function (elem, num) {
-    var lengthHashtag = arr[num].length;
-    var firstSign = arr[num][0];
-    for (var index = 1; index < arr[num].length; index++) {
-      if (arr[num][index] === '#') {
-        inputHashTags.setCustomValidity('Хэштеги нужно разделяться пробелом');
-        return;
-      }
-    }
-    if (arr.length > 1) {
-      for (num = 0; num < arr.length; num++) {
-        for (var j = num + 1; j < arr.length; j++) {
-          if (arr[j] === arr[num]) {
-            inputHashTags.setCustomValidity('Нельзя использовать два одинаковых хэштега');
-            return;
-          }
-        }
-      }
-    }
+// Проверка на валидность хэштегов
+var checkHashtagsForValidations = function (arrayHashTags) {
+  for (var elem = 0; elem < arrayHashTags.length; elem++) {
+    var elementArray = arrayHashTags[elem];
+    var lengthHashtag = elementArray.length;
+    var firstSign = elementArray[0];
+
     if (firstSign !== '#') {
       inputHashTags.setCustomValidity('Хэштег начинается со знака "#"(решётка)');
       return;
@@ -374,23 +360,43 @@ var validations = function (arr) {
       inputHashTags.setCustomValidity('Введено больше 25 символов для одного хэштэга');
       return;
     }
-    if (arr.length > MAX_HASHTAGS) {
-      inputHashTags.setCustomValidity('Введено больше пяти хэштегов');
-    } else {
-      inputHashTags.setCustomValidity('');
+
+    for (var index = 1; index < elementArray.length; index++) {
+      if (elementArray[index] === '#') {
+        inputHashTags.setCustomValidity('Хэштеги нужно разделяться пробелом');
+        return;
+      }
     }
-  });
+  }
+
+  var hasRepeatedTags = function (arr) {
+    var repeatedTags = false;
+    if (arr.length > 1) {
+      for (var n = 0; n < arr.length; n++) {
+        for (var j = n + 1; j < arr.length; j++) {
+          if (arr[j] === arr[n]) {
+            repeatedTags = true;
+          }
+        }
+      }
+    }
+    return repeatedTags;
+  };
+  if (hasRepeatedTags(arrayHashTags)) {
+    inputHashTags.setCustomValidity('Нельзя использовать два одинаковых хэштега');
+    return;
+  }
+  if (arrayHashTags.length > MAX_HASHTAGS) {
+    inputHashTags.setCustomValidity('Введено больше пяти хэштегов');
+    return;
+  }
+
+  inputHashTags.setCustomValidity('');
 };
 
-inputHashTags.addEventListener('keydown', function (evt) {
-  if (evt.keyCode === SPACE_KEYCODE) {
-    var elementsHashTags = evt.target.value.trim().toLowerCase().split(' ');
-    validations(elementsHashTags);
-  }
-  inputHashTags.addEventListener('change', function () {
-    var elementsHashTags2 = evt.target.value.trim().toLowerCase().split(' ');
-    validations(elementsHashTags2);
-  });
+inputHashTags.addEventListener('change', function (evt) {
+  var arrayHashTags = evt.target.value.trim().toLowerCase().split(' ');
+  checkHashtagsForValidations(arrayHashTags);
 });
 
 inputHashTags.addEventListener('focus', function () {
