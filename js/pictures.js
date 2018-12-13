@@ -341,6 +341,21 @@ var MAX_LENGTH_HASHTAG = 20;
 
 var inputHashTags = document.querySelector('input[name="hashtags"]');
 
+// Проверяет наличие одинаковых элементов в массиве
+var hasRepeatedTags = function (arr) {
+  var repeatedTags = false;
+  if (arr.length > 1) {
+    for (var n = 0; n < arr.length; n++) {
+      for (var j = n + 1; j < arr.length; j++) {
+        if (arr[j] === arr[n]) {
+          repeatedTags = true;
+        }
+      }
+    }
+  }
+  return repeatedTags;
+};
+
 // Проверка на валидность хэштегов
 var checkHashtagsForValidations = function (arrayHashTags) {
   for (var elem = 0; elem < arrayHashTags.length; elem++) {
@@ -353,7 +368,7 @@ var checkHashtagsForValidations = function (arrayHashTags) {
       return;
     }
     if (lengthHashtag === 1) {
-      inputHashTags.setCustomValidity('Хэштег больше одного знака');
+      inputHashTags.setCustomValidity('Хэштег не может состоять только из одной "#"(решётки)');
       return;
     }
     if (lengthHashtag > MAX_LENGTH_HASHTAG) {
@@ -368,20 +383,6 @@ var checkHashtagsForValidations = function (arrayHashTags) {
       }
     }
   }
-
-  var hasRepeatedTags = function (arr) {
-    var repeatedTags = false;
-    if (arr.length > 1) {
-      for (var n = 0; n < arr.length; n++) {
-        for (var j = n + 1; j < arr.length; j++) {
-          if (arr[j] === arr[n]) {
-            repeatedTags = true;
-          }
-        }
-      }
-    }
-    return repeatedTags;
-  };
   if (hasRepeatedTags(arrayHashTags)) {
     inputHashTags.setCustomValidity('Нельзя использовать два одинаковых хэштега');
     return;
@@ -394,7 +395,7 @@ var checkHashtagsForValidations = function (arrayHashTags) {
   inputHashTags.setCustomValidity('');
 };
 
-inputHashTags.addEventListener('change', function (evt) {
+inputHashTags.addEventListener('input', function (evt) {
   var arrayHashTags = evt.target.value.trim().toLowerCase().split(' ');
   checkHashtagsForValidations(arrayHashTags);
 });
