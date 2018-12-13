@@ -220,6 +220,7 @@ var drawBigPicture = function (object) {
 // ==========================4-ОЕ ЗАДАНИЕ "ПОДРОБНОСТИ"===================================
 
 var ESC_KEYCODE = 27;
+// var SPACE_KEYCODE = 32;
 
 var imgUploady = document.querySelector('.img-upload');
 var uploadFile = document.getElementById('upload-file');
@@ -330,3 +331,79 @@ var addThumbnailClickHandler = function (thumbnail, picture) {
 for (var indexArr = 0; indexArr < thumbnails.length; indexArr++) {
   addThumbnailClickHandler(thumbnails[indexArr], pictures[indexArr]);
 }
+
+// ==================================================================
+
+// Хэш-теги
+
+var MAX_HASHTAGS = 5;
+var MAX_LENGTH_HASHTAG = 20;
+
+var inputHashTags = document.querySelector('input[name="hashtags"]');
+
+// Проверяет наличие одинаковых элементов в массиве
+var hasRepeatedTags = function (arr) {
+  var repeatedTags = false;
+  if (arr.length > 1) {
+    for (var n = 0; n < arr.length; n++) {
+      for (var j = n + 1; j < arr.length; j++) {
+        if (arr[j] === arr[n]) {
+          repeatedTags = true;
+        }
+      }
+    }
+  }
+  return repeatedTags;
+};
+
+// Проверка на валидность хэштегов
+var checkHashtagsForValidations = function (arrayHashTags) {
+  for (var elem = 0; elem < arrayHashTags.length; elem++) {
+    var elementArray = arrayHashTags[elem];
+    var lengthHashtag = elementArray.length;
+    var firstSign = elementArray[0];
+
+    if (firstSign !== '#') {
+      inputHashTags.setCustomValidity('Хэштег начинается со знака "#"(решётка)');
+      return;
+    }
+    if (lengthHashtag === 1) {
+      inputHashTags.setCustomValidity('Хэштег не может состоять только из одной "#"(решётки)');
+      return;
+    }
+    if (lengthHashtag > MAX_LENGTH_HASHTAG) {
+      inputHashTags.setCustomValidity('Введено больше 25 символов для одного хэштэга');
+      return;
+    }
+
+    for (var index = 1; index < elementArray.length; index++) {
+      if (elementArray[index] === '#') {
+        inputHashTags.setCustomValidity('Хэштеги нужно разделяться пробелом');
+        return;
+      }
+    }
+  }
+  if (hasRepeatedTags(arrayHashTags)) {
+    inputHashTags.setCustomValidity('Нельзя использовать два одинаковых хэштега');
+    return;
+  }
+  if (arrayHashTags.length > MAX_HASHTAGS) {
+    inputHashTags.setCustomValidity('Введено больше пяти хэштегов');
+    return;
+  }
+
+  inputHashTags.setCustomValidity('');
+};
+
+inputHashTags.addEventListener('input', function (evt) {
+  var arrayHashTags = evt.target.value.trim().toLowerCase().split(' ');
+  checkHashtagsForValidations(arrayHashTags);
+});
+
+inputHashTags.addEventListener('focus', function () {
+  document.removeEventListener('keydown', onUploadOverlayEscPress);
+});
+
+inputHashTags.addEventListener('blur', function () {
+  document.addEventListener('keydown', onUploadOverlayEscPress);
+});
