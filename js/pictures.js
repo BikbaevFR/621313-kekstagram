@@ -227,9 +227,6 @@ var uploadFile = document.getElementById('upload-file');
 var uploadCancel = document.getElementById('upload-cancel');
 var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
 
-var effectLevel = imgUploady.querySelector('input[name="effect-level"]');
-var effectLevelPin = imgUploady.querySelector('.effect-level__pin');
-
 // Закрывает по нажатию на esc
 var onUploadOverlayEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
@@ -258,15 +255,6 @@ uploadFile.addEventListener('change', function () {
 
 uploadCancel.addEventListener('click', function () {
   closeImgUploadOverlay();
-});
-
-// ==================================================================
-
-// Пин
-// Оставил реализацию слайдера на следующую лекцию
-
-effectLevelPin.addEventListener('mouseup', function () {
-  effectLevel.value = '50';
 });
 
 // ==================================================================
@@ -406,4 +394,48 @@ inputHashTags.addEventListener('focus', function () {
 
 inputHashTags.addEventListener('blur', function () {
   document.addEventListener('keydown', onUploadOverlayEscPress);
+});
+
+// ==================================================================
+
+// Пин
+
+var effectLevelLine = imgUploady.querySelector('.effect-level__line');
+var effectLevelDepth = imgUploady.querySelector('.effect-level__depth');
+var effectLevelPin = imgUploady.querySelector('.effect-level__pin');
+
+effectLevelPin.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  var sliderPinWidth = effectLevelPin.offsetWidth;
+  var sliderLineWidth = effectLevelLine.offsetWidth;
+  var initialPinPosition = effectLevelPin.offsetLeft - sliderPinWidth / 2;
+  var startCoordsMouseX = evt.clientX;
+
+  var sliderPinMouseMoveHandler = function (evtMouseMove) {
+    evtMouseMove.preventDefault();
+
+    var shift = startCoordsMouseX - evtMouseMove.clientX;
+    startCoordsMouseX = evtMouseMove.clientX;
+
+    var newPinPosition = initialPinPosition - shift;
+    initialPinPosition = newPinPosition;
+
+    var newPinPositionInPercent = Math.round(newPinPosition * 100 / sliderLineWidth);
+
+    if (newPinPositionInPercent <= 100 && newPinPositionInPercent >= 0) {
+      effectLevelPin.style.left = newPinPositionInPercent + '%';
+      effectLevelDepth.style.width = newPinPositionInPercent + '%';
+    }
+  };
+
+  var sliderPinMouseUpHandler = function (evtMouseUp) {
+    evtMouseUp.preventDefault();
+
+    document.removeEventListener('mousemove', sliderPinMouseMoveHandler);
+    document.removeEventListener('mouseup', sliderPinMouseUpHandler);
+  };
+
+  document.addEventListener('mousemove', sliderPinMouseMoveHandler);
+  document.addEventListener('mouseup', sliderPinMouseUpHandler);
 });
