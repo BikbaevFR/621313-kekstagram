@@ -259,26 +259,6 @@ uploadCancel.addEventListener('click', function () {
 
 // ==================================================================
 
-// Эффекты превьюшки
-
-var effectsList = document.querySelector('.effects__list');
-var previewPhoto = document.querySelector('.img-upload__preview');
-
-// переменная для хранения текущего эффекта
-var currentEffect = '';
-
-effectsList.addEventListener('change', function (evt) {
-  var button = evt.target;
-  var effectName = button.value;
-
-  previewPhoto.classList.remove('effects__preview--' + currentEffect);
-  previewPhoto.classList.add('effects__preview--' + effectName);
-
-  currentEffect = effectName;
-});
-
-// ==================================================================
-
 // Открытие картинок в полноэкранном режиме
 
 var thumbnails = document.querySelectorAll('.picture__img');
@@ -398,18 +378,73 @@ inputHashTags.addEventListener('blur', function () {
 
 // ==================================================================
 
-// Пин
+// Изменение позиции пина слайдера и значений фильтров
 
-var effectLevelLine = imgUploady.querySelector('.effect-level__line');
-var effectLevelDepth = imgUploady.querySelector('.effect-level__depth');
-var effectLevelPin = imgUploady.querySelector('.effect-level__pin');
+var DEFAULT_EFFECT_LEVEL = '100%';
 
-effectLevelPin.addEventListener('mousedown', function (evt) {
+var EFFECT_CHROME = {
+  filterType: 'grayscale',
+  min: 0,
+  max: 1,
+  unit: ''
+};
+
+var EFFECT_SEPIA = {
+  filterType: 'sepia',
+  min: 0,
+  max: 1,
+  unit: ''
+};
+
+var EFFECT_MARVIN = {
+  filterType: 'invert',
+  min: 0,
+  max: 100,
+  unit: '%'
+};
+
+var EFFECT_PHOBOS = {
+  filterType: 'blur',
+  min: 0,
+  max: 3,
+  unit: 'px'
+};
+
+var EFFECT_HEAT = {
+  filterType: 'brightness',
+  min: 1,
+  max: 3,
+  unit: ''
+};
+
+var previewPhoto = imgUploadOverlay.querySelector('.img-upload__preview');
+var imgPreview = previewPhoto.querySelector('img');
+
+var sliderEffectLevel = imgUploadOverlay.querySelector('.effect-level');
+var sliderEffectLevelValue = sliderEffectLevel.querySelector('.effect-level__value');
+var sliderLine = sliderEffectLevel.querySelector('.effect-level__line');
+var sliderDepth = sliderEffectLevel.querySelector('.effect-level__depth');
+var sliderPin = sliderEffectLevel.querySelector('.effect-level__pin');
+
+var effectsList = imgUploadOverlay.querySelector('.effects__list');
+var currentEffect;
+
+var changeEffectLevel = function (type, level, unit) {
+  imgPreview.style.filter = type + '(' + level + unit + ')';
+};
+
+var transformPinPositionToEffectLevel = function () {
+  sliderEffectLevelValue.value = parseInt(sliderPin.style.left, 10);
+  var effectLevel = ((currentEffect.max - currentEffect.min) * sliderEffectLevelValue.value / 100) + currentEffect.min;
+  return effectLevel;
+};
+
+sliderPin.addEventListener('mousedown', function (evt) {
   evt.preventDefault();
 
-  var sliderPinWidth = effectLevelPin.offsetWidth;
-  var sliderLineWidth = effectLevelLine.offsetWidth;
-  var initialPinPosition = effectLevelPin.offsetLeft - sliderPinWidth / 2;
+  var sliderPinWidth = sliderPin.offsetWidth;
+  var sliderLineWidth = sliderLine.offsetWidth;
+  var initialPinPosition = sliderPin.offsetLeft - sliderPinWidth / 2;
   var startCoordsMouseX = evt.clientX;
 
   var sliderPinMouseMoveHandler = function (evtMouseMove) {
@@ -424,8 +459,9 @@ effectLevelPin.addEventListener('mousedown', function (evt) {
     var newPinPositionInPercent = Math.round(newPinPosition * 100 / sliderLineWidth);
 
     if (newPinPositionInPercent <= 100 && newPinPositionInPercent >= 0) {
-      effectLevelPin.style.left = newPinPositionInPercent + '%';
-      effectLevelDepth.style.width = newPinPositionInPercent + '%';
+      sliderPin.style.left = newPinPositionInPercent + '%';
+      sliderDepth.style.width = newPinPositionInPercent + '%';
+      changeEffectLevel(currentEffect.filterType, transformPinPositionToEffectLevel(), currentEffect.unit);
     }
   };
 
@@ -439,3 +475,46 @@ effectLevelPin.addEventListener('mousedown', function (evt) {
   document.addEventListener('mousemove', sliderPinMouseMoveHandler);
   document.addEventListener('mouseup', sliderPinMouseUpHandler);
 });
+
+var resetSliderValuesToDefault = function () {
+  sliderPin.style.left = DEFAULT_EFFECT_LEVEL;
+  sliderDepth.style.width = DEFAULT_EFFECT_LEVEL;
+  imgPreview.className = '';
+  imgPreview.style.filter = '';
+};
+
+var changeEffectType = function (effect) {
+  resetSliderValuesToDefault();
+  if (effect !== 'none') {
+    sliderEffectLevel.classList.remove('hidden');
+  }
+  var effectClassName = 'effects__preview--' + effect;
+  imgPreview.classList.add(effectClassName);
+};
+
+var effectsListClickHandler = function (evt) {
+  var effectType = evt.target.value;
+  switch (effectType) {
+    case 'chrome':
+      currentEffect = EFFECT_CHROME;
+      break;
+    case 'sepia':
+      currentEffect = EFFECT_SEPIA;
+      break;
+    case 'marvin':
+      currentEffect = EFFECT_MARVIN;
+      break;
+    case 'phobos':
+      currentEffect = EFFECT_PHOBOS;
+      break;
+    case 'heat':
+      currentEffect = EFFECT_HEAT;
+      break;
+    case 'none':
+      sliderEffectLevel.classList.add('hidden');
+      break;
+  }
+  changeEffectType(effectType);
+};
+
+effectsList.addEventListener('click', effectsListClickHandler);
