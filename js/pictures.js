@@ -21,6 +21,16 @@ var DESCRIPTIONS = [
 // Общее количество картинок на главной стр.
 var QUANTITY_PICTURES = 25;
 
+// Показывает элемент
+var showElement = function (element) {
+  element.classList.remove('hidden');
+};
+
+// Скрывает элемент
+var hideElement = function (element) {
+  element.classList.add('hidden');
+};
+
 // Выдает рандомное число
 var getRandomInteger = function (min, max) {
   var rand = min - 0.5 + Math.random() * (max - min + 1);
@@ -227,6 +237,12 @@ var uploadFile = document.getElementById('upload-file');
 var uploadCancel = document.getElementById('upload-cancel');
 var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
 
+var sliderEffectLevel = imgUploadOverlay.querySelector('.effect-level');
+
+var previewPhoto = imgUploadOverlay.querySelector('.img-upload__preview');
+var imgPreview = previewPhoto.querySelector('img');
+var effectClassName;
+
 // Закрывает по нажатию на esc
 var onUploadOverlayEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
@@ -236,13 +252,15 @@ var onUploadOverlayEscPress = function (evt) {
 
 // Открывает блок загрузки и редактирования картинок
 var openImgUploadOverlay = function () {
-  imgUploadOverlay.classList.remove('hidden');
+  showElement(imgUploadOverlay);
+  hideElement(sliderEffectLevel);
   document.addEventListener('keydown', onUploadOverlayEscPress);
 };
 
 // Закрывает блок загрузки и редактирования картинок
 var closeImgUploadOverlay = function () {
-  imgUploadOverlay.classList.add('hidden');
+  hideElement(imgUploadOverlay);
+  imgPreview.classList.remove(effectClassName);
   document.removeEventListener('keydown', onUploadOverlayEscPress);
 
   // TODO: Доделать очистку поля при закрытии
@@ -273,13 +291,13 @@ var onBigPictuteEscPress = function (evt) {
 
 // Открывает в полноэкранном режиме картинку
 var openBigPicture = function () {
-  bigPicture.classList.remove('hidden');
+  showElement(bigPicture);
   document.addEventListener('keydown', onBigPictuteEscPress);
 };
 
 // Закрывает картинку в полноэкранном режиме
 var closeBigPicture = function () {
-  bigPicture.classList.add('hidden');
+  hideElement(bigPicture);
   document.removeEventListener('keydown', onBigPictuteEscPress);
 };
 
@@ -382,45 +400,39 @@ inputHashTags.addEventListener('blur', function () {
 
 var DEFAULT_EFFECT_LEVEL = '100%';
 
-var EFFECT_CHROME = {
-  filterType: 'grayscale',
-  min: 0,
-  max: 1,
-  unit: ''
+var Effects = {
+  CHROME: {
+    filterType: 'grayscale',
+    min: 0,
+    max: 1,
+    unit: ''
+  },
+  SEPIA: {
+    filterType: 'sepia',
+    min: 0,
+    max: 1,
+    unit: ''
+  },
+  MARVIN: {
+    filterType: 'invert',
+    min: 0,
+    max: 100,
+    unit: '%'
+  },
+  PHOBOS: {
+    filterType: 'blur',
+    min: 0,
+    max: 3,
+    unit: 'px'
+  },
+  HEAT: {
+    filterType: 'brightness',
+    min: 1,
+    max: 3,
+    unit: ''
+  }
 };
 
-var EFFECT_SEPIA = {
-  filterType: 'sepia',
-  min: 0,
-  max: 1,
-  unit: ''
-};
-
-var EFFECT_MARVIN = {
-  filterType: 'invert',
-  min: 0,
-  max: 100,
-  unit: '%'
-};
-
-var EFFECT_PHOBOS = {
-  filterType: 'blur',
-  min: 0,
-  max: 3,
-  unit: 'px'
-};
-
-var EFFECT_HEAT = {
-  filterType: 'brightness',
-  min: 1,
-  max: 3,
-  unit: ''
-};
-
-var previewPhoto = imgUploadOverlay.querySelector('.img-upload__preview');
-var imgPreview = previewPhoto.querySelector('img');
-
-var sliderEffectLevel = imgUploadOverlay.querySelector('.effect-level');
 var sliderEffectLevelValue = sliderEffectLevel.querySelector('.effect-level__value');
 var sliderLine = sliderEffectLevel.querySelector('.effect-level__line');
 var sliderDepth = sliderEffectLevel.querySelector('.effect-level__depth');
@@ -486,34 +498,18 @@ var resetSliderValuesToDefault = function () {
 var changeEffectType = function (effect) {
   resetSliderValuesToDefault();
   if (effect !== 'none') {
-    sliderEffectLevel.classList.remove('hidden');
+    showElement(sliderEffectLevel);
+  } else {
+    hideElement(sliderEffectLevel);
   }
-  var effectClassName = 'effects__preview--' + effect;
+  effectClassName = 'effects__preview--' + effect;
   imgPreview.classList.add(effectClassName);
 };
 
 var effectsListClickHandler = function (evt) {
   var effectType = evt.target.value;
-  switch (effectType) {
-    case 'chrome':
-      currentEffect = EFFECT_CHROME;
-      break;
-    case 'sepia':
-      currentEffect = EFFECT_SEPIA;
-      break;
-    case 'marvin':
-      currentEffect = EFFECT_MARVIN;
-      break;
-    case 'phobos':
-      currentEffect = EFFECT_PHOBOS;
-      break;
-    case 'heat':
-      currentEffect = EFFECT_HEAT;
-      break;
-    case 'none':
-      sliderEffectLevel.classList.add('hidden');
-      break;
-  }
+  var effectTypeToUpperCase = effectType.toUpperCase();
+  currentEffect = Effects[effectTypeToUpperCase];
   changeEffectType(effectType);
 };
 
