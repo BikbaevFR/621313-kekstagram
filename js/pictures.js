@@ -21,6 +21,16 @@ var DESCRIPTIONS = [
 // Общее количество картинок на главной стр.
 var QUANTITY_PICTURES = 25;
 
+// Показывает элемент
+var showElement = function (element) {
+  element.classList.remove('hidden');
+};
+
+// Скрывает элемент
+var hideElement = function (element) {
+  element.classList.add('hidden');
+};
+
 // Выдает рандомное число
 var getRandomInteger = function (min, max) {
   var rand = min - 0.5 + Math.random() * (max - min + 1);
@@ -227,8 +237,11 @@ var uploadFile = document.getElementById('upload-file');
 var uploadCancel = document.getElementById('upload-cancel');
 var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
 
-var effectLevel = imgUploady.querySelector('input[name="effect-level"]');
-var effectLevelPin = imgUploady.querySelector('.effect-level__pin');
+var sliderEffectLevel = imgUploadOverlay.querySelector('.effect-level');
+
+var previewPhoto = imgUploadOverlay.querySelector('.img-upload__preview');
+var imgPreview = previewPhoto.querySelector('img');
+var effectClassName;
 
 // Закрывает по нажатию на esc
 var onUploadOverlayEscPress = function (evt) {
@@ -239,13 +252,15 @@ var onUploadOverlayEscPress = function (evt) {
 
 // Открывает блок загрузки и редактирования картинок
 var openImgUploadOverlay = function () {
-  imgUploadOverlay.classList.remove('hidden');
+  showElement(imgUploadOverlay);
+  hideElement(sliderEffectLevel);
   document.addEventListener('keydown', onUploadOverlayEscPress);
 };
 
 // Закрывает блок загрузки и редактирования картинок
 var closeImgUploadOverlay = function () {
-  imgUploadOverlay.classList.add('hidden');
+  hideElement(imgUploadOverlay);
+  imgPreview.classList.remove(effectClassName);
   document.removeEventListener('keydown', onUploadOverlayEscPress);
 
   // TODO: Доделать очистку поля при закрытии
@@ -258,35 +273,6 @@ uploadFile.addEventListener('change', function () {
 
 uploadCancel.addEventListener('click', function () {
   closeImgUploadOverlay();
-});
-
-// ==================================================================
-
-// Пин
-// Оставил реализацию слайдера на следующую лекцию
-
-effectLevelPin.addEventListener('mouseup', function () {
-  effectLevel.value = '50';
-});
-
-// ==================================================================
-
-// Эффекты превьюшки
-
-var effectsList = document.querySelector('.effects__list');
-var previewPhoto = document.querySelector('.img-upload__preview');
-
-// переменная для хранения текущего эффекта
-var currentEffect = '';
-
-effectsList.addEventListener('change', function (evt) {
-  var button = evt.target;
-  var effectName = button.value;
-
-  previewPhoto.classList.remove('effects__preview--' + currentEffect);
-  previewPhoto.classList.add('effects__preview--' + effectName);
-
-  currentEffect = effectName;
 });
 
 // ==================================================================
@@ -305,13 +291,13 @@ var onBigPictuteEscPress = function (evt) {
 
 // Открывает в полноэкранном режиме картинку
 var openBigPicture = function () {
-  bigPicture.classList.remove('hidden');
+  showElement(bigPicture);
   document.addEventListener('keydown', onBigPictuteEscPress);
 };
 
 // Закрывает картинку в полноэкранном режиме
 var closeBigPicture = function () {
-  bigPicture.classList.add('hidden');
+  hideElement(bigPicture);
   document.removeEventListener('keydown', onBigPictuteEscPress);
 };
 
@@ -407,3 +393,124 @@ inputHashTags.addEventListener('focus', function () {
 inputHashTags.addEventListener('blur', function () {
   document.addEventListener('keydown', onUploadOverlayEscPress);
 });
+
+// ==================================================================
+
+// Изменение позиции пина слайдера и значений фильтров
+
+var DEFAULT_EFFECT_LEVEL = '100%';
+
+var Effects = {
+  CHROME: {
+    filterType: 'grayscale',
+    min: 0,
+    max: 1,
+    unit: ''
+  },
+  SEPIA: {
+    filterType: 'sepia',
+    min: 0,
+    max: 1,
+    unit: ''
+  },
+  MARVIN: {
+    filterType: 'invert',
+    min: 0,
+    max: 100,
+    unit: '%'
+  },
+  PHOBOS: {
+    filterType: 'blur',
+    min: 0,
+    max: 3,
+    unit: 'px'
+  },
+  HEAT: {
+    filterType: 'brightness',
+    min: 1,
+    max: 3,
+    unit: ''
+  }
+};
+
+var sliderEffectLevelValue = sliderEffectLevel.querySelector('.effect-level__value');
+var sliderLine = sliderEffectLevel.querySelector('.effect-level__line');
+var sliderDepth = sliderEffectLevel.querySelector('.effect-level__depth');
+var sliderPin = sliderEffectLevel.querySelector('.effect-level__pin');
+
+var effectsList = imgUploadOverlay.querySelector('.effects__list');
+var currentEffect;
+
+var changeEffectLevel = function (type, level, unit) {
+  imgPreview.style.filter = type + '(' + level + unit + ')';
+};
+
+var transformPinPositionToEffectLevel = function () {
+  sliderEffectLevelValue.value = parseInt(sliderPin.style.left, 10);
+  var effectLevel = ((currentEffect.max - currentEffect.min) * sliderEffectLevelValue.value / 100) + currentEffect.min;
+  return effectLevel;
+};
+
+sliderPin.addEventListener('mousedown', function (evt) {
+  evt.preventDefault();
+
+  var sliderPinWidth = sliderPin.offsetWidth;
+  var sliderLineWidth = sliderLine.offsetWidth;
+  var initialPinPosition = sliderPin.offsetLeft - sliderPinWidth / 2;
+  var startCoordsMouseX = evt.clientX;
+
+  var sliderPinMouseMoveHandler = function (evtMouseMove) {
+    evtMouseMove.preventDefault();
+
+    var shift = startCoordsMouseX - evtMouseMove.clientX;
+    startCoordsMouseX = evtMouseMove.clientX;
+
+    var newPinPosition = initialPinPosition - shift;
+    initialPinPosition = newPinPosition;
+
+    var newPinPositionInPercent = Math.round(newPinPosition * 100 / sliderLineWidth);
+
+    if (newPinPositionInPercent <= 100 && newPinPositionInPercent >= 0) {
+      sliderPin.style.left = newPinPositionInPercent + '%';
+      sliderDepth.style.width = newPinPositionInPercent + '%';
+      changeEffectLevel(currentEffect.filterType, transformPinPositionToEffectLevel(), currentEffect.unit);
+    }
+  };
+
+  var sliderPinMouseUpHandler = function (evtMouseUp) {
+    evtMouseUp.preventDefault();
+
+    document.removeEventListener('mousemove', sliderPinMouseMoveHandler);
+    document.removeEventListener('mouseup', sliderPinMouseUpHandler);
+  };
+
+  document.addEventListener('mousemove', sliderPinMouseMoveHandler);
+  document.addEventListener('mouseup', sliderPinMouseUpHandler);
+});
+
+var resetSliderValuesToDefault = function () {
+  sliderPin.style.left = DEFAULT_EFFECT_LEVEL;
+  sliderDepth.style.width = DEFAULT_EFFECT_LEVEL;
+  imgPreview.className = '';
+  imgPreview.style.filter = '';
+};
+
+var changeEffectType = function (effect) {
+  resetSliderValuesToDefault();
+  if (effect !== 'none') {
+    showElement(sliderEffectLevel);
+  } else {
+    hideElement(sliderEffectLevel);
+  }
+  effectClassName = 'effects__preview--' + effect;
+  imgPreview.classList.add(effectClassName);
+};
+
+var effectsListClickHandler = function (evt) {
+  var effectType = evt.target.value;
+  var effectTypeToUpperCase = effectType.toUpperCase();
+  currentEffect = Effects[effectTypeToUpperCase];
+  changeEffectType(effectType);
+};
+
+effectsList.addEventListener('click', effectsListClickHandler);
