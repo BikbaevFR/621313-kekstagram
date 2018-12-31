@@ -41,29 +41,17 @@
   };
 
   var drawBigPicture = function (object) {
-    // Меняем адрес картинки
     bigPictureImg.src = object.url;
-
-    // Меняем количество лайков картинки
     bigPictureLikesCount.textContent = object.likes;
-
     addCommentToList(object);
-
-    // Меняем описание картинки
     bigPictureDescription.textContent = object.description;
-
-    // Прячем блок счётчика комментариев
     bigPictureCommentCount.classList.add('visually-hidden');
-
-    // Прячем блок загрузки новых комментариев
     bigPictureCommentsLoader.classList.add('visually-hidden');
   };
 
   // Закрывает по нажатию на esc
   var onBigPictuteEscPress = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeBigPicture();
-    }
+    window.util.isEscEvent(evt, closeBigPicture);
   };
 
   // Открывает в полноэкранном режиме картинку
@@ -92,6 +80,6 @@
 
   // Перебирает два массива и передает addThumbnailClickHandler
   for (var j = 0; j < thumbnails.length; j++) {
-    addThumbnailClickHandler(thumbnails[j], window.picture.pictures[j]);
+    addThumbnailClickHandler(thumbnails[j], window.pictures[j]);
   }
 })();

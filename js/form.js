@@ -4,7 +4,7 @@
   var MAX_HASHTAGS = 5;
   var MAX_LENGTH_HASHTAG = 20;
   var DEFAULT_EFFECT_LEVEL = '100%';
-  var MULTIPLICAND = 100;
+  var PERCENT_MULTIPLICAND = 100;
 
   var Effects = {
     CHROME: {
@@ -58,9 +58,7 @@
 
   // Закрывает по нажатию на esc
   var onUploadOverlayEscPress = function (evt) {
-    if (evt.keyCode === window.util.Keycode.ESC) {
-      closeImgUploadOverlay();
-    }
+    window.util.isEscEvent(evt, closeImgUploadOverlay);
   };
 
   // Открывает блок загрузки и редактирования картинок
@@ -148,7 +146,7 @@
   // Переводит значение позиции пина в уровень эффекта
   var transformPinPositionToEffectLevel = function () {
     sliderEffectLevelValue.value = parseInt(sliderPin.style.left, 10);
-    var effectLevel = ((currentEffect.max - currentEffect.min) * sliderEffectLevelValue.value / MULTIPLICAND) + currentEffect.min;
+    var effectLevel = ((currentEffect.max - currentEffect.min) * sliderEffectLevelValue.value / PERCENT_MULTIPLICAND) + currentEffect.min;
     return effectLevel;
   };
 
@@ -169,9 +167,9 @@
       var newPinPosition = initialPinPosition - shift;
       initialPinPosition = newPinPosition;
 
-      var newPinPositionInPercent = Math.round(newPinPosition * MULTIPLICAND / sliderLineWidth);
+      var newPinPositionInPercent = Math.round(newPinPosition * PERCENT_MULTIPLICAND / sliderLineWidth);
 
-      if (newPinPositionInPercent <= MULTIPLICAND && newPinPositionInPercent >= 0) {
+      if (newPinPositionInPercent <= PERCENT_MULTIPLICAND && newPinPositionInPercent >= 0) {
         sliderPin.style.left = newPinPositionInPercent + '%';
         sliderDepth.style.width = newPinPositionInPercent + '%';
         changeEffectLevel(currentEffect.filterType, transformPinPositionToEffectLevel(), currentEffect.unit);
@@ -210,10 +208,12 @@
   };
 
   var effectsListClickHandler = function (evt) {
-    var effectType = evt.target.value;
-    var effectTypeToUpperCase = effectType.toUpperCase();
-    currentEffect = Effects[effectTypeToUpperCase];
-    changeEffectType(effectType);
+    if (evt.target.tagName === 'INPUT') {
+      var effectType = evt.target.value;
+      var effectTypeToUpperCase = effectType.toUpperCase();
+      currentEffect = Effects[effectTypeToUpperCase];
+      changeEffectType(effectType);
+    }
   };
 
   effectsList.addEventListener('click', effectsListClickHandler);

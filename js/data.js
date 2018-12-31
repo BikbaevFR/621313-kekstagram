@@ -114,7 +114,6 @@
     return randomArrayPicture;
   };
 
-  window.data = {
-    getRandomArrayPicture: getRandomArrayPicture
-  };
+  var pictures = getRandomArrayPicture();
+  window.pictures = pictures;
 })();

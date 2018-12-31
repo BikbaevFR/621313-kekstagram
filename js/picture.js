@@ -4,8 +4,6 @@
   var сontainerPictures = document.querySelector('.pictures');
   var similarPictureTemplate = document.querySelector('#picture').content;
 
-  var pictures = window.data.getRandomArrayPicture();
-
   // Отдает рандомную картинку созданную на основе шаблона
   var renderPicture = function (picture) {
     // Копируем шаблон
@@ -19,12 +17,8 @@
   };
 
   var fragment = document.createDocumentFragment();
-  for (var i = 0; i < pictures.length; i++) {
-    fragment.appendChild(renderPicture(pictures[i]));
+  for (var i = 0; i < window.pictures.length; i++) {
+    fragment.appendChild(renderPicture(window.pictures[i]));
   }
   сontainerPictures.appendChild(fragment);
-
-  window.picture = {
-    pictures: pictures
-  };
 })();

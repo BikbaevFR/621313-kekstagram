@@ -1,8 +1,12 @@
 'use strict';
 
 (function () {
-  var Keycode = {
-    ESC: 27
+  var ESC_KEYCODE = 27;
+
+  var isEscEvent = function (evt, action) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      action();
+    }
   };
 
   // Показывает элемент
@@ -54,6 +58,6 @@
     getRandomInteger: getRandomInteger,
     makeElement: makeElement,
     checksArrayForIdenticalElements: checksArrayForIdenticalElements,
-    Keycode: Keycode
+    isEscEvent: isEscEvent
   };
 })();
