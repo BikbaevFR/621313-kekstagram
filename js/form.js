@@ -52,7 +52,12 @@
   var sliderLine = sliderEffectLevel.querySelector('.effect-level__line');
   var sliderDepth = sliderEffectLevel.querySelector('.effect-level__depth');
   var sliderPin = sliderEffectLevel.querySelector('.effect-level__pin');
-
+  var form = document.querySelector('.img-upload__form');
+  var main = document.querySelector('main');
+  var successTemplate = document.querySelector('#success');
+  var success = successTemplate.content.querySelector('.success');
+  var errorTemplate = document.querySelector('#error');
+  var error = errorTemplate.content.querySelector('.error');
   var currentEffect;
   var effectClassName;
 
@@ -70,11 +75,12 @@
 
   // Закрывает блок загрузки и редактирования картинок
   var closeImgUploadOverlay = function () {
+    uploadFile.value = '';
     window.util.hideElement(imgUploadOverlay);
+    imgPreview.style.filter = '';
     imgPreview.classList.remove(effectClassName);
     document.removeEventListener('keydown', onUploadOverlayEscPress);
-
-    // TODO: Доделать очистку поля при закрытии
+    form.reset();
   };
 
   // Обработчики событий
@@ -95,34 +101,41 @@
 
       if (firstSign !== '#') {
         inputHashTags.setCustomValidity('Хэштег начинается со знака "#"(решётка)');
+        inputHashTags.style = 'border: 3px solid red';
         return;
       }
       if (lengthHashtag === 1) {
         inputHashTags.setCustomValidity('Хэштег не может состоять только из одной "#"(решётки)');
+        inputHashTags.style = 'border: 3px solid red';
         return;
       }
       if (lengthHashtag > MAX_LENGTH_HASHTAG) {
         inputHashTags.setCustomValidity('Введено больше 25 символов для одного хэштэга');
+        inputHashTags.style = 'border: 3px solid red';
         return;
       }
 
       for (var j = 1; j < elementArray.length; j++) {
         if (elementArray[j] === '#') {
           inputHashTags.setCustomValidity('Хэштеги нужно разделяться пробелом');
+          inputHashTags.style = 'border: 3px solid red';
           return;
         }
       }
     }
     if (window.util.checksArrayForIdenticalElements(arrayHashTags)) {
       inputHashTags.setCustomValidity('Нельзя использовать два одинаковых хэштега');
+      inputHashTags.style = 'border: 3px solid red';
       return;
     }
     if (arrayHashTags.length > MAX_HASHTAGS) {
       inputHashTags.setCustomValidity('Введено больше пяти хэштегов');
+      inputHashTags.style = 'border: 3px solid red';
       return;
     }
 
     inputHashTags.setCustomValidity('');
+    inputHashTags.style = 'border: 3px solid blue';
   };
 
   inputHashTags.addEventListener('input', function (evt) {
@@ -216,5 +229,48 @@
     }
   };
 
+  // Отправка данных на сервер
+  var closeSuccess = function () {
+    main.removeChild(document.querySelector('.success'));
+  };
+
+  var closeError = function () {
+    main.removeChild(document.querySelector('.error'));
+  };
+
+  var successEscKeydownHandler = function (evt) {
+    window.util.isEscEvent(evt, closeSuccess);
+  };
+
+  var errorEscKeydownHandler = function (evt) {
+    window.util.isEscEvent(evt, closeError);
+  };
+
+  var uploadSubmitClickHandler = function (evt) {
+    window.backend.upLoad(new FormData(form), succsessUploadHandler, errorUploadHandler);
+    evt.preventDefault();
+  };
+
+  var succsessUploadHandler = function () {
+    closeImgUploadOverlay();
+    var successMessage = success.cloneNode(true);
+
+    main.appendChild(successMessage);
+    document.querySelector('.success__button').addEventListener('click', closeSuccess);
+    document.addEventListener('keydown', successEscKeydownHandler);
+    document.querySelector('.success').addEventListener('click', closeSuccess);
+  };
+
+  var errorUploadHandler = function () {
+    closeImgUploadOverlay();
+    var errorMessage = error.cloneNode(true);
+
+    main.appendChild(errorMessage);
+    document.querySelector('.error__button').addEventListener('click', closeError);
+    document.addEventListener('keydown', errorEscKeydownHandler);
+    document.querySelector('.error').addEventListener('click', closeError);
+  };
+
   effectsList.addEventListener('click', effectsListClickHandler);
+  form.addEventListener('submit', uploadSubmitClickHandler);
 })();
