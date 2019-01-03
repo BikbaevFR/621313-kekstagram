@@ -94,48 +94,42 @@
 
   // Проверка на валидность хэштегов
   var checkHashtagsForValidations = function (arrayHashTags) {
+    var message = '';
+
     for (var i = 0; i < arrayHashTags.length; i++) {
       var elementArray = arrayHashTags[i];
       var lengthHashtag = elementArray.length;
       var firstSign = elementArray[0];
 
       if (firstSign !== '#') {
-        inputHashTags.setCustomValidity('Хэштег начинается со знака "#"(решётка)');
-        inputHashTags.style = 'border: 3px solid red';
-        return;
+        message = 'Хэштег начинается со знака "#"(решётка)';
       }
       if (lengthHashtag === 1) {
-        inputHashTags.setCustomValidity('Хэштег не может состоять только из одной "#"(решётки)');
-        inputHashTags.style = 'border: 3px solid red';
-        return;
+        message = 'Хэштег не может состоять только из одной "#"(решётки)';
       }
       if (lengthHashtag > MAX_LENGTH_HASHTAG) {
-        inputHashTags.setCustomValidity('Введено больше 25 символов для одного хэштэга');
-        inputHashTags.style = 'border: 3px solid red';
-        return;
+        message = 'Введено больше 25 символов для одного хэштэга';
       }
 
       for (var j = 1; j < elementArray.length; j++) {
         if (elementArray[j] === '#') {
-          inputHashTags.setCustomValidity('Хэштеги нужно разделяться пробелом');
-          inputHashTags.style = 'border: 3px solid red';
-          return;
+          message = 'Хэштеги нужно разделяться пробелом';
         }
       }
     }
     if (window.util.checksArrayForIdenticalElements(arrayHashTags)) {
-      inputHashTags.setCustomValidity('Нельзя использовать два одинаковых хэштега');
-      inputHashTags.style = 'border: 3px solid red';
-      return;
+      message = 'Нельзя использовать два одинаковых хэштега';
     }
     if (arrayHashTags.length > MAX_HASHTAGS) {
-      inputHashTags.setCustomValidity('Введено больше пяти хэштегов');
-      inputHashTags.style = 'border: 3px solid red';
-      return;
+      message = 'Введено больше пяти хэштегов';
     }
 
-    inputHashTags.setCustomValidity('');
-    inputHashTags.style = 'border: 3px solid blue';
+    inputHashTags.setCustomValidity(message);
+    if (message) {
+      inputHashTags.classList.add('text__hashtags--invalid');
+    } else {
+      inputHashTags.classList.remove('text__hashtags--invalid');
+    }
   };
 
   inputHashTags.addEventListener('input', function (evt) {
@@ -236,6 +230,7 @@
 
   var closeError = function () {
     main.removeChild(document.querySelector('.error'));
+    document.addEventListener('keydown', onUploadOverlayEscPress);
   };
 
   var successEscKeydownHandler = function (evt) {
@@ -262,11 +257,12 @@
   };
 
   var errorUploadHandler = function () {
-    closeImgUploadOverlay();
+    document.removeEventListener('keydown', onUploadOverlayEscPress);
     var errorMessage = error.cloneNode(true);
 
     main.appendChild(errorMessage);
-    document.querySelector('.error__button').addEventListener('click', closeError);
+    document.querySelector('.error__button--again').addEventListener('click', closeError);
+    document.querySelector('.error__button--other').addEventListener('click', closeImgUploadOverlay);
     document.addEventListener('keydown', errorEscKeydownHandler);
     document.querySelector('.error').addEventListener('click', closeError);
   };

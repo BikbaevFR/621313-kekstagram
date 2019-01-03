@@ -6,11 +6,11 @@
     UPLOAD: 'https://js.dump.academy/kekstagram/'
   };
 
-  var StatusesCode = {
-    STATUS_OK: 200,
+  var StatusCode = {
+    SUCCESS: 200,
     REQUEST_ERROR: 400,
     NOT_FOUND_ERROR: 404,
-    INTERNAL_ERROR: 500
+    SERVER_ERROR: 500
   };
 
   var createRequest = function (url, method, onLoad, onError, data) {
@@ -21,16 +21,16 @@
     xhr.addEventListener('load', function () {
       var error;
       switch (xhr.status) {
-        case StatusesCode.STATUS_OK:
+        case StatusCode.SUCCESS:
           onLoad(xhr.response);
           break;
-        case StatusesCode.REQUEST_ERROR:
+        case StatusCode.REQUEST_ERROR:
           error = 'Неверный запрос';
           break;
-        case StatusesCode.NOT_FOUND_ERROR:
+        case StatusCode.NOT_FOUND_ERROR:
           error = 'Ничего не найдено';
           break;
-        case StatusesCode.INTERNAL_ERROR:
+        case StatusCode.SERVER_ERROR:
           error = 'Внутренняя ошибка сервера';
           break;
         default:

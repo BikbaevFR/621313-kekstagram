@@ -3,7 +3,6 @@
 (function () {
   var сontainerPictures = document.querySelector('.pictures');
   var similarPictureTemplate = document.querySelector('#picture').content;
-  var thumbnails;
 
   // Отдает рандомную картинку созданную на основе шаблона
   var renderPicture = function (picture) {
@@ -23,7 +22,7 @@
       fragment.appendChild(renderPicture(arrayPictures[i]));
     }
     сontainerPictures.appendChild(fragment);
-    thumbnails = document.querySelectorAll('.picture__img');
+    var thumbnails = document.querySelectorAll('.picture__img');
     window.showBigPicture(thumbnails, arrayPictures);
   };
 
