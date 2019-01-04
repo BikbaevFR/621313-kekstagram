@@ -9,7 +9,6 @@
   var bigPictureCommentCount = bigPicture.querySelector('.social__comment-count');
   var bigPictureCommentsLoader = bigPicture.querySelector('.comments-loader');
   var bigPictureCommentsList = document.querySelector('.social__comments');
-  var thumbnails = document.querySelectorAll('.picture__img');
   var bigPictureCancel = document.getElementById('picture-cancel');
 
   // Создает рандомный комментарий
@@ -17,11 +16,11 @@
     var listItem = window.util.makeElement('li', 'social__comment');
 
     var avatar = window.util.makeElement('img', 'social__picture');
-    avatar.src = 'img/avatar-' + window.util.getRandomInteger(1, 6) + '.svg';
+    avatar.src = comment.avatar;
     avatar.alt = 'Аватар комментатора фотографии';
     listItem.appendChild(avatar);
 
-    var textComments = window.util.makeElement('p', 'social__text', comment);
+    var textComments = window.util.makeElement('p', 'social__text', comment.message);
     listItem.appendChild(textComments);
 
     return listItem;
@@ -79,7 +78,11 @@
   };
 
   // Перебирает два массива и передает addThumbnailClickHandler
-  for (var j = 0; j < thumbnails.length; j++) {
-    addThumbnailClickHandler(thumbnails[j], window.pictures[j]);
-  }
+  var showBigPicture = function (thumbnails, pictures) {
+    for (var j = 0; j < thumbnails.length; j++) {
+      addThumbnailClickHandler(thumbnails[j], pictures[j]);
+    }
+  };
+
+  window.showBigPicture = showBigPicture;
 })();

@@ -52,7 +52,12 @@
   var sliderLine = sliderEffectLevel.querySelector('.effect-level__line');
   var sliderDepth = sliderEffectLevel.querySelector('.effect-level__depth');
   var sliderPin = sliderEffectLevel.querySelector('.effect-level__pin');
-
+  var form = document.querySelector('.img-upload__form');
+  var main = document.querySelector('main');
+  var successTemplate = document.querySelector('#success');
+  var success = successTemplate.content.querySelector('.success');
+  var errorTemplate = document.querySelector('#error');
+  var error = errorTemplate.content.querySelector('.error');
   var currentEffect;
   var effectClassName;
 
@@ -70,11 +75,12 @@
 
   // Закрывает блок загрузки и редактирования картинок
   var closeImgUploadOverlay = function () {
+    uploadFile.value = '';
     window.util.hideElement(imgUploadOverlay);
+    imgPreview.style.filter = '';
     imgPreview.classList.remove(effectClassName);
     document.removeEventListener('keydown', onUploadOverlayEscPress);
-
-    // TODO: Доделать очистку поля при закрытии
+    form.reset();
   };
 
   // Обработчики событий
@@ -88,41 +94,42 @@
 
   // Проверка на валидность хэштегов
   var checkHashtagsForValidations = function (arrayHashTags) {
+    var message = '';
+
     for (var i = 0; i < arrayHashTags.length; i++) {
       var elementArray = arrayHashTags[i];
       var lengthHashtag = elementArray.length;
       var firstSign = elementArray[0];
 
       if (firstSign !== '#') {
-        inputHashTags.setCustomValidity('Хэштег начинается со знака "#"(решётка)');
-        return;
+        message = 'Хэштег начинается со знака "#"(решётка)';
       }
       if (lengthHashtag === 1) {
-        inputHashTags.setCustomValidity('Хэштег не может состоять только из одной "#"(решётки)');
-        return;
+        message = 'Хэштег не может состоять только из одной "#"(решётки)';
       }
       if (lengthHashtag > MAX_LENGTH_HASHTAG) {
-        inputHashTags.setCustomValidity('Введено больше 25 символов для одного хэштэга');
-        return;
+        message = 'Введено больше 25 символов для одного хэштэга';
       }
 
       for (var j = 1; j < elementArray.length; j++) {
         if (elementArray[j] === '#') {
-          inputHashTags.setCustomValidity('Хэштеги нужно разделяться пробелом');
-          return;
+          message = 'Хэштеги нужно разделяться пробелом';
         }
       }
     }
     if (window.util.checksArrayForIdenticalElements(arrayHashTags)) {
-      inputHashTags.setCustomValidity('Нельзя использовать два одинаковых хэштега');
-      return;
+      message = 'Нельзя использовать два одинаковых хэштега';
     }
     if (arrayHashTags.length > MAX_HASHTAGS) {
-      inputHashTags.setCustomValidity('Введено больше пяти хэштегов');
-      return;
+      message = 'Введено больше пяти хэштегов';
     }
 
-    inputHashTags.setCustomValidity('');
+    inputHashTags.setCustomValidity(message);
+    if (message) {
+      inputHashTags.classList.add('text__hashtags--invalid');
+    } else {
+      inputHashTags.classList.remove('text__hashtags--invalid');
+    }
   };
 
   inputHashTags.addEventListener('input', function (evt) {
@@ -216,5 +223,50 @@
     }
   };
 
+  // Отправка данных на сервер
+  var closeSuccess = function () {
+    main.removeChild(document.querySelector('.success'));
+  };
+
+  var closeError = function () {
+    main.removeChild(document.querySelector('.error'));
+    document.addEventListener('keydown', onUploadOverlayEscPress);
+  };
+
+  var successEscKeydownHandler = function (evt) {
+    window.util.isEscEvent(evt, closeSuccess);
+  };
+
+  var errorEscKeydownHandler = function (evt) {
+    window.util.isEscEvent(evt, closeError);
+  };
+
+  var uploadSubmitClickHandler = function (evt) {
+    window.backend.upLoad(new FormData(form), succsessUploadHandler, errorUploadHandler);
+    evt.preventDefault();
+  };
+
+  var succsessUploadHandler = function () {
+    closeImgUploadOverlay();
+    var successMessage = success.cloneNode(true);
+
+    main.appendChild(successMessage);
+    document.querySelector('.success__button').addEventListener('click', closeSuccess);
+    document.addEventListener('keydown', successEscKeydownHandler);
+    document.querySelector('.success').addEventListener('click', closeSuccess);
+  };
+
+  var errorUploadHandler = function () {
+    document.removeEventListener('keydown', onUploadOverlayEscPress);
+    var errorMessage = error.cloneNode(true);
+
+    main.appendChild(errorMessage);
+    document.querySelector('.error__button--again').addEventListener('click', closeError);
+    document.querySelector('.error__button--other').addEventListener('click', closeImgUploadOverlay);
+    document.addEventListener('keydown', errorEscKeydownHandler);
+    document.querySelector('.error').addEventListener('click', closeError);
+  };
+
   effectsList.addEventListener('click', effectsListClickHandler);
+  form.addEventListener('submit', uploadSubmitClickHandler);
 })();
