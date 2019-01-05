@@ -751,7 +751,7 @@ main {
   border-radius: 5px;
 }
 
-.text__hashtags--invalid {
+.text--invalid {
   outline: 3px solid red;
 }
 
