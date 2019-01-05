@@ -59,14 +59,6 @@
 
   window.backend.downLoad(succsessDownloadHandler, errorDownloadHandler);
 
-  var showFilterActive = function (elem) {
-    elem.classList.add(filterActiveClassName);
-  };
-
-  var hideFilterActive = function (elem) {
-    elem.classList.remove(filterActiveClassName);
-  };
-
   // Удаляем картинки
   var deletePictures = function () {
     var deletedPictures = сontainerPictures.querySelectorAll('.picture');
@@ -94,33 +86,24 @@
     return shortenedArray;
   };
 
-  filterPopular.addEventListener('click', function () {
-    if (currentFilter) {
-      hideFilterActive(currentFilter);
-    }
-    showFilterActive(filterPopular);
-    currentFilter = filterPopular;
+  var changeFilterButtonStyle = function (filter) {
+    currentFilter.classList.remove(filterActiveClassName);
+    filter.classList.add(filterActiveClassName);
+    currentFilter = filter;
+  };
+
+  var filterPopularClickHandler = function () {
     deletePictures();
     renderPictures(picturesArray);
-  });
+  };
 
-  filterNew.addEventListener('click', function () {
-    if (currentFilter) {
-      hideFilterActive(currentFilter);
-    }
-    showFilterActive(filterNew);
-    currentFilter = filterNew;
+  var filterNewClickHandler = function () {
     deletePictures();
     picturesArrayCopy = picturesArray.slice();
     renderPictures(getRandomArray(picturesArrayCopy, 10));
-  });
+  };
 
-  filterDiscussed.addEventListener('click', function () {
-    if (currentFilter) {
-      hideFilterActive(currentFilter);
-    }
-    showFilterActive(filterDiscussed);
-    currentFilter = filterDiscussed;
+  var filterDiscussedClickHandler = function () {
     deletePictures();
     picturesArrayCopy = picturesArray.slice();
     picturesArrayCopy.sort(function (first, second) {
@@ -133,5 +116,20 @@
       }
     });
     renderPictures(picturesArrayCopy);
+  };
+
+  filterPopular.addEventListener('click', function () {
+    changeFilterButtonStyle(filterPopular);
+    window.debounce(filterPopularClickHandler);
+  });
+
+  filterNew.addEventListener('click', function () {
+    changeFilterButtonStyle(filterNew);
+    window.debounce(filterNewClickHandler);
+  });
+
+  filterDiscussed.addEventListener('click', function () {
+    changeFilterButtonStyle(filterDiscussed);
+    window.debounce(filterDiscussedClickHandler);
   });
 })();

@@ -336,8 +336,3 @@
   effectsList.addEventListener('click', effectsListClickHandler);
   form.addEventListener('submit', uploadSubmitClickHandler);
 })();
-
-
-// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
