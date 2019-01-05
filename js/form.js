@@ -4,6 +4,9 @@
   var MAX_HASHTAGS = 5;
   var MAX_LENGTH_HASHTAG = 20;
   var MAX_LENGTH_COMMENT = 140;
+  var SCALE_STEP = 25;
+  var MAX_SCALE_VALUE = 100;
+  var MIN_SCALE_VALUE = 25;
   var DEFAULT_EFFECT_LEVEL = '100%';
   var PERCENT_MULTIPLICAND = 100;
 
@@ -45,10 +48,13 @@
   var uploadCancel = document.getElementById('upload-cancel');
   var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
   var effectsList = imgUploadOverlay.querySelector('.effects__list');
-  var previewPhoto = imgUploadOverlay.querySelector('.img-upload__preview');
-  var imgPreview = previewPhoto.querySelector('img');
+  var previewImage = imgUploadOverlay.querySelector('.img-upload__preview');
+  var imgPreview = previewImage.querySelector('img');
   var inputHashTags = document.querySelector('input[name="hashtags"]');
   var fieldComment = document.querySelector('textarea[name="description"]');
+  var scaleControlSmaller = imgUploadOverlay.querySelector('.scale__control--smaller');
+  var scaleControlBigger = imgUploadOverlay.querySelector('.scale__control--bigger');
+  var scaleControl = imgUploadOverlay.querySelector('.scale__control--value');
   var sliderEffectLevel = imgUploadOverlay.querySelector('.effect-level');
   var sliderEffectLevelValue = sliderEffectLevel.querySelector('.effect-level__value');
   var sliderLine = sliderEffectLevel.querySelector('.effect-level__line');
@@ -62,6 +68,14 @@
   var error = errorTemplate.content.querySelector('.error');
   var currentEffect;
   var effectClassName;
+
+  // Дефолт формы
+  var resetForm = function () {
+    previewImage.style.transform = '';
+    imgPreview.style.filter = '';
+    imgPreview.classList.remove(effectClassName);
+    form.reset();
+  };
 
   // Закрывает по нажатию на esc
   var uploadOverlayEscPressHandler = function (evt) {
@@ -77,12 +91,9 @@
 
   // Закрывает блок загрузки и редактирования картинок
   var closeImgUploadOverlay = function () {
-    uploadFile.value = '';
+    resetForm();
     window.util.hideElement(imgUploadOverlay);
-    imgPreview.style.filter = '';
-    imgPreview.classList.remove(effectClassName);
     document.removeEventListener('keydown', uploadOverlayEscPressHandler);
-    form.reset();
   };
 
   // Обработчики событий
@@ -176,6 +187,28 @@
 
   fieldComment.addEventListener('blur', function () {
     document.addEventListener('keydown', uploadOverlayEscPressHandler);
+  });
+
+  // Масштабирует картинку
+  var scalePreviewImage = function (trend) {
+    var value = Number(scaleControl.value.replace('%', ''));
+    if (value === trend) {
+      return;
+    }
+    if (trend === 25) {
+      scaleControl.value = (value - SCALE_STEP) + '%';
+    } else {
+      scaleControl.value = (value + SCALE_STEP) + '%';
+    }
+    previewImage.style.transform = 'scale(' + scaleControl.value.replace('%', '') / 100 + ')';
+  };
+
+  scaleControlSmaller.addEventListener('click', function () {
+    scalePreviewImage(MIN_SCALE_VALUE);
+  });
+
+  scaleControlBigger.addEventListener('click', function () {
+    scalePreviewImage(MAX_SCALE_VALUE);
   });
 
   // Изменяет уровень эффекта
@@ -303,3 +336,8 @@
   effectsList.addEventListener('click', effectsListClickHandler);
   form.addEventListener('submit', uploadSubmitClickHandler);
 })();
+
+
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
