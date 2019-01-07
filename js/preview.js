@@ -58,21 +58,21 @@
   };
 
   // Закрывает по нажатию на esc
-  var onBigPictuteEscPress = function (evt) {
+  var bigPictuteEscPressHandler = function (evt) {
     window.util.isEscEvent(evt, closeBigPicture);
   };
 
   // Открывает в полноэкранном режиме картинку
   var openBigPicture = function () {
     window.util.showElement(bigPicture);
-    document.addEventListener('keydown', onBigPictuteEscPress);
+    document.addEventListener('keydown', bigPictuteEscPressHandler);
   };
 
   // Закрывает картинку в полноэкранном режиме
   var closeBigPicture = function () {
     resetComments();
     window.util.hideElement(bigPicture);
-    document.removeEventListener('keydown', onBigPictuteEscPress);
+    document.removeEventListener('keydown', bigPictuteEscPressHandler);
   };
 
   bigPictureCancel.addEventListener('click', function () {
