@@ -52,12 +52,33 @@
     return identicalElements;
   };
 
+  // Получаем рандомный массив ограниченный по длине
+  var getRandomArray = function (array, n) {
+    var randomArray = array.slice();
+    var currentIndex = randomArray.length;
+    var temporaryValue;
+    var randomIndex;
+
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex -= 1;
+
+      temporaryValue = randomArray[currentIndex];
+      randomArray[currentIndex] = randomArray[randomIndex];
+      randomArray[randomIndex] = temporaryValue;
+    }
+
+    var shortenedArray = randomArray.slice(0, n);
+    return shortenedArray;
+  };
+
   window.util = {
     showElement: showElement,
     hideElement: hideElement,
     getRandomInteger: getRandomInteger,
     makeElement: makeElement,
     checksArrayForIdenticalElements: checksArrayForIdenticalElements,
-    isEscEvent: isEscEvent
+    isEscEvent: isEscEvent,
+    getRandomArray: getRandomArray
   };
 })();

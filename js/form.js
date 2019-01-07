@@ -3,6 +3,10 @@
 (function () {
   var MAX_HASHTAGS = 5;
   var MAX_LENGTH_HASHTAG = 20;
+  var MAX_LENGTH_COMMENT = 140;
+  var SCALE_STEP = 25;
+  var MAX_SCALE_VALUE = 100;
+  var MIN_SCALE_VALUE = 25;
   var DEFAULT_EFFECT_LEVEL = '100%';
   var PERCENT_MULTIPLICAND = 100;
 
@@ -40,13 +44,17 @@
   };
 
   var imgUploady = document.querySelector('.img-upload');
-  var uploadFile = document.getElementById('upload-file');
+  var uploadInput = document.getElementById('upload-file');
   var uploadCancel = document.getElementById('upload-cancel');
   var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
   var effectsList = imgUploadOverlay.querySelector('.effects__list');
-  var previewPhoto = imgUploadOverlay.querySelector('.img-upload__preview');
-  var imgPreview = previewPhoto.querySelector('img');
+  var previewImage = imgUploadOverlay.querySelector('.img-upload__preview');
+  var imgPreview = previewImage.querySelector('img');
   var inputHashTags = document.querySelector('input[name="hashtags"]');
+  var fieldComment = document.querySelector('textarea[name="description"]');
+  var scaleControlSmaller = imgUploadOverlay.querySelector('.scale__control--smaller');
+  var scaleControlBigger = imgUploadOverlay.querySelector('.scale__control--bigger');
+  var scaleControl = imgUploadOverlay.querySelector('.scale__control--value');
   var sliderEffectLevel = imgUploadOverlay.querySelector('.effect-level');
   var sliderEffectLevelValue = sliderEffectLevel.querySelector('.effect-level__value');
   var sliderLine = sliderEffectLevel.querySelector('.effect-level__line');
@@ -61,8 +69,16 @@
   var currentEffect;
   var effectClassName;
 
+  // Дефолт формы
+  var resetForm = function () {
+    previewImage.style.transform = '';
+    imgPreview.style.filter = '';
+    imgPreview.classList.remove(effectClassName);
+    form.reset();
+  };
+
   // Закрывает по нажатию на esc
-  var onUploadOverlayEscPress = function (evt) {
+  var uploadOverlayEscPressHandler = function (evt) {
     window.util.isEscEvent(evt, closeImgUploadOverlay);
   };
 
@@ -70,21 +86,18 @@
   var openImgUploadOverlay = function () {
     window.util.showElement(imgUploadOverlay);
     window.util.hideElement(sliderEffectLevel);
-    document.addEventListener('keydown', onUploadOverlayEscPress);
+    document.addEventListener('keydown', uploadOverlayEscPressHandler);
   };
 
   // Закрывает блок загрузки и редактирования картинок
   var closeImgUploadOverlay = function () {
-    uploadFile.value = '';
+    resetForm();
     window.util.hideElement(imgUploadOverlay);
-    imgPreview.style.filter = '';
-    imgPreview.classList.remove(effectClassName);
-    document.removeEventListener('keydown', onUploadOverlayEscPress);
-    form.reset();
+    document.removeEventListener('keydown', uploadOverlayEscPressHandler);
   };
 
   // Обработчики событий
-  uploadFile.addEventListener('change', function () {
+  uploadInput.addEventListener('change', function () {
     openImgUploadOverlay();
   });
 
@@ -96,39 +109,41 @@
   var checkHashtagsForValidations = function (arrayHashTags) {
     var message = '';
 
-    for (var i = 0; i < arrayHashTags.length; i++) {
-      var elementArray = arrayHashTags[i];
-      var lengthHashtag = elementArray.length;
-      var firstSign = elementArray[0];
+    if (arrayHashTags[0]) {
+      for (var i = 0; i < arrayHashTags.length; i++) {
+        var elementArray = arrayHashTags[i];
+        var lengthHashtag = elementArray.length;
+        var firstSign = elementArray[0];
 
-      if (firstSign !== '#') {
-        message = 'Хэштег начинается со знака "#"(решётка)';
-      }
-      if (lengthHashtag === 1) {
-        message = 'Хэштег не может состоять только из одной "#"(решётки)';
-      }
-      if (lengthHashtag > MAX_LENGTH_HASHTAG) {
-        message = 'Введено больше 25 символов для одного хэштэга';
-      }
+        if (firstSign !== '#') {
+          message = 'Хэштег начинается со знака "#"(решётка)';
+        }
+        if (lengthHashtag === 1) {
+          message = 'Хэштег не может состоять только из одной "#"(решётки)';
+        }
+        if (lengthHashtag > MAX_LENGTH_HASHTAG) {
+          message = 'Введено больше 25 символов для одного хэштэга';
+        }
 
-      for (var j = 1; j < elementArray.length; j++) {
-        if (elementArray[j] === '#') {
-          message = 'Хэштеги нужно разделяться пробелом';
+        for (var j = 1; j < elementArray.length; j++) {
+          if (elementArray[j] === '#') {
+            message = 'Хэштеги нужно разделяться пробелом';
+          }
         }
       }
-    }
-    if (window.util.checksArrayForIdenticalElements(arrayHashTags)) {
-      message = 'Нельзя использовать два одинаковых хэштега';
-    }
-    if (arrayHashTags.length > MAX_HASHTAGS) {
-      message = 'Введено больше пяти хэштегов';
+      if (window.util.checksArrayForIdenticalElements(arrayHashTags)) {
+        message = 'Нельзя использовать два одинаковых хэштега';
+      }
+      if (arrayHashTags.length > MAX_HASHTAGS) {
+        message = 'Введено больше пяти хэштегов';
+      }
     }
 
     inputHashTags.setCustomValidity(message);
     if (message) {
-      inputHashTags.classList.add('text__hashtags--invalid');
+      inputHashTags.classList.add('text--invalid');
     } else {
-      inputHashTags.classList.remove('text__hashtags--invalid');
+      inputHashTags.classList.remove('text--invalid');
     }
   };
 
@@ -138,11 +153,62 @@
   });
 
   inputHashTags.addEventListener('focus', function () {
-    document.removeEventListener('keydown', onUploadOverlayEscPress);
+    document.removeEventListener('keydown', uploadOverlayEscPressHandler);
   });
 
   inputHashTags.addEventListener('blur', function () {
-    document.addEventListener('keydown', onUploadOverlayEscPress);
+    document.addEventListener('keydown', uploadOverlayEscPressHandler);
+  });
+
+
+  var checkCommentForValidations = function (length) {
+    var message = '';
+
+    if (length > MAX_LENGTH_COMMENT) {
+      message = 'Комментарии не могут быть больше 140 символов';
+    }
+
+    fieldComment.setCustomValidity(message);
+    if (message) {
+      fieldComment.classList.add('text--invalid');
+    } else {
+      fieldComment.classList.remove('text--invalid');
+    }
+  };
+
+  fieldComment.addEventListener('input', function (evt) {
+    var commentLength = evt.target.value.length;
+    checkCommentForValidations(commentLength);
+  });
+
+  fieldComment.addEventListener('focus', function () {
+    document.removeEventListener('keydown', uploadOverlayEscPressHandler);
+  });
+
+  fieldComment.addEventListener('blur', function () {
+    document.addEventListener('keydown', uploadOverlayEscPressHandler);
+  });
+
+  // Масштабирует картинку
+  var scalePreviewImage = function (trend) {
+    var value = Number(scaleControl.value.replace('%', ''));
+    if (value === trend) {
+      return;
+    }
+    if (trend === 25) {
+      scaleControl.value = (value - SCALE_STEP) + '%';
+    } else {
+      scaleControl.value = (value + SCALE_STEP) + '%';
+    }
+    previewImage.style.transform = 'scale(' + scaleControl.value.replace('%', '') / 100 + ')';
+  };
+
+  scaleControlSmaller.addEventListener('click', function () {
+    scalePreviewImage(MIN_SCALE_VALUE);
+  });
+
+  scaleControlBigger.addEventListener('click', function () {
+    scalePreviewImage(MAX_SCALE_VALUE);
   });
 
   // Изменяет уровень эффекта
@@ -230,7 +296,7 @@
 
   var closeError = function () {
     main.removeChild(document.querySelector('.error'));
-    document.addEventListener('keydown', onUploadOverlayEscPress);
+    document.addEventListener('keydown', uploadOverlayEscPressHandler);
   };
 
   var successEscKeydownHandler = function (evt) {
@@ -257,7 +323,7 @@
   };
 
   var errorUploadHandler = function () {
-    document.removeEventListener('keydown', onUploadOverlayEscPress);
+    document.removeEventListener('keydown', uploadOverlayEscPressHandler);
     var errorMessage = error.cloneNode(true);
 
     main.appendChild(errorMessage);
