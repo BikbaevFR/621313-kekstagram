@@ -10,9 +10,7 @@
   var filterDiscussed = document.querySelector('#filter-discussed');
   var filterActiveClassName = 'img-filters__button--active';
   var currentFilter = filterPopular;
-
   var picturesArray = [];
-  var picturesArrayCopy = [];
 
   // Отдает рандомную картинку созданную на основе шаблона
   var renderPicture = function (picture) {
@@ -67,23 +65,18 @@
     }
   };
 
-  // Получаем рандомный массив (10 элементов)
-  var getRandomArray = function (array, n) {
-    var currentIndex = array.length;
-    var temporaryValue;
-    var randomIndex;
-
-    while (currentIndex !== 0) {
-      randomIndex = Math.floor(Math.random() * currentIndex);
-      currentIndex -= 1;
-
-      temporaryValue = array[currentIndex];
-      array[currentIndex] = array[randomIndex];
-      array[randomIndex] = temporaryValue;
-    }
-
-    var shortenedArray = array.slice(0, n);
-    return shortenedArray;
+  var getSortArrayByСomments = function (array) {
+    var sortArray = array.slice();
+    sortArray.sort(function (first, second) {
+      if (first.comments < second.comments) {
+        return 1;
+      } else if (first.comments > second.comments) {
+        return -1;
+      } else {
+        return 0;
+      }
+    });
+    return sortArray;
   };
 
   var changeFilterButtonStyle = function (filter) {
@@ -99,23 +92,12 @@
 
   var filterNewClickHandler = function () {
     deletePictures();
-    picturesArrayCopy = picturesArray.slice();
-    renderPictures(getRandomArray(picturesArrayCopy, 10));
+    renderPictures(window.util.getRandomArray(picturesArray, 10));
   };
 
   var filterDiscussedClickHandler = function () {
     deletePictures();
-    picturesArrayCopy = picturesArray.slice();
-    picturesArrayCopy.sort(function (first, second) {
-      if (first.comments < second.comments) {
-        return 1;
-      } else if (first.comments > second.comments) {
-        return -1;
-      } else {
-        return 0;
-      }
-    });
-    renderPictures(picturesArrayCopy);
+    renderPictures(getSortArrayByСomments(picturesArray));
   };
 
   filterPopular.addEventListener('click', function () {

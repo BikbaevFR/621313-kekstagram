@@ -44,7 +44,7 @@
   };
 
   var imgUploady = document.querySelector('.img-upload');
-  var uploadFile = document.getElementById('upload-file');
+  var uploadInput = document.getElementById('upload-file');
   var uploadCancel = document.getElementById('upload-cancel');
   var imgUploadOverlay = imgUploady.querySelector('.img-upload__overlay');
   var effectsList = imgUploadOverlay.querySelector('.effects__list');
@@ -97,7 +97,7 @@
   };
 
   // Обработчики событий
-  uploadFile.addEventListener('change', function () {
+  uploadInput.addEventListener('change', function () {
     openImgUploadOverlay();
   });
 
