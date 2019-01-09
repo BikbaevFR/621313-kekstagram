@@ -101,8 +101,6 @@
     var allComments = picture.comments.length;
     bigPictureCommentUploaded.textContent = openComments;
     bigPictureCommentCount.textContent = allComments;
-
-    // bigPictureCommentCountBlock.innerHTML = openComments + ' из <span class="comments-count">' + allComments + '</span> комментариев</div>';
   };
 
   var commentsLoaderClickHandler = function () {
