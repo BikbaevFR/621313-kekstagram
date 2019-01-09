@@ -317,7 +317,7 @@
     var successMessage = success.cloneNode(true);
 
     main.appendChild(successMessage);
-    document.querySelector('.success__button').addEventListener('click', closeSuccess);
+    // document.querySelector('.success__button').addEventListener('click', closeSuccess);
     document.addEventListener('keydown', successEscKeydownHandler);
     document.querySelector('.success').addEventListener('click', closeSuccess);
   };
@@ -327,7 +327,7 @@
     var errorMessage = error.cloneNode(true);
 
     main.appendChild(errorMessage);
-    document.querySelector('.error__button--again').addEventListener('click', closeError);
+    // document.querySelector('.error__button--again').addEventListener('click', closeError);
     document.querySelector('.error__button--other').addEventListener('click', closeImgUploadOverlay);
     document.addEventListener('keydown', errorEscKeydownHandler);
     document.querySelector('.error').addEventListener('click', closeError);
